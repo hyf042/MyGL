@@ -1,5 +1,5 @@
-#ifndef _MYGL_RENDERINGCONTEXT_SFMLCONTEXT_H_
-#define _MYGL_RENDERINGCONTEXT_SFMLCONTEXT_H_
+#ifndef _MYGL_CONTEXT_SFMLCONTEXT_H_
+#define _MYGL_CONTEXT_SFMLCONTEXT_H_
 
 #include <SFML/Graphics.hpp>
 #include "RenderingContext.h"
@@ -16,14 +16,14 @@ namespace MyGL {
 		}
 
 		override void CreateWindow(int width, int height, const string& title) {
-			_window = shared_ptr<sf::RenderWindow>(new sf::RenderWindow(sf::VideoMode(width, height), title));
+			_window = make_shared<sf::RenderWindow>(sf::VideoMode(width, height), title);
 
-			_texture = shared_ptr<sf::Texture>(new sf::Texture());
+			_texture = make_shared<sf::Texture>();
 			if (!_texture->create(width, height)) {
 				throw new Exception("Error to create texture");
 			}
 
-			_sprite = shared_ptr<sf::Sprite>(new sf::Sprite());
+			_sprite = make_shared<sf::Sprite>();
 			_sprite->setTexture(*_texture);
 		}
 

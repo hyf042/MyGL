@@ -1,14 +1,16 @@
-#ifndef _MYGL_STRUCTURES_PIXELBUFFER_H_
-#define _MYGL_STRUCTURES_PIXELBUFFER_H_
+#ifndef _MYGL_CORE_STRUCTURES_PIXELBUFFER_H_
+#define _MYGL_CORE_STRUCTURES_PIXELBUFFER_H_
 
 #include "Color.h"
 #include "../PreDefines.h"
+#include "../Interfaces/IClonable.h"
 
 namespace MyGL {
-	class PixelBuffer {
+	class PixelBuffer : public IClonable<PixelBuffer> {
 	public:
 		PixelBuffer(int width, int height);
 		PixelBuffer(int width, int height, PixelFormat pixelFormat);
+		virtual ~PixelBuffer() {}
 
 		int width() const { return _width; }
 		int height() const { return _height; }
@@ -44,7 +46,7 @@ namespace MyGL {
 			}
 		}
 
-		PixelBuffer Clone() const;
+		override PixelBuffer Clone() const;
 
 	private:
 		vector<uint8> _pixels;

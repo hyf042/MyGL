@@ -1,12 +1,11 @@
-#ifndef _MYGL_STRUCTURES_COLOR_H_
-#define _MYGL_STRUCTURES_COLOR_H_
+#ifndef _MYGL_CORE_STRUCTURES_COLOR_H_
+#define _MYGL_CORE_STRUCTURES_COLOR_H_
 
 #include "../Math.h"
 #include "../PreDefines.h"
 
 namespace MyGL {
 	struct Color {
-	public:
 		float a, r, g, b;
 
 		Color(int _r, int _g, int _b) : r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f), a(1.0f) {}

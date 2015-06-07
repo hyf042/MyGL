@@ -26,6 +26,7 @@ namespace MyGL {
 
 	using std::shared_ptr;
 	using std::weak_ptr;
+	using std::make_shared;
 	using std::vector;
 
 	class Exception;

@@ -1,5 +1,5 @@
-#ifndef _MYGL_RENDERINGCONTEXT_RENDERINGCONTEXT_H_
-#define _MYGL_RENDERINGCONTEXT_RENDERINGCONTEXT_H_
+#ifndef _MYGL_CONTEXT_RENDERINGCONTEXT_H_
+#define _MYGL_CONTEXT_RENDERINGCONTEXT_H_
 
 #include "../Core/PreDefines.h"
 #include "../Core/Structures/PixelBuffer.h"
