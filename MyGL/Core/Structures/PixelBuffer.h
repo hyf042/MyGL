@@ -46,7 +46,7 @@ namespace MyGL {
 			}
 		}
 
-		override PixelBuffer Clone() const;
+		override shared_ptr<PixelBuffer> Clone() const;
 
 	private:
 		vector<uint8> _pixels;

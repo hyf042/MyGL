@@ -6,6 +6,10 @@ namespace MyGL {
 	public:
 		Exception() : exception() {}
 		explicit Exception(string error) : exception(error.c_str()) {}
+
+		static Exception IndexOutOfRangeException() {
+			return Exception("[MyGL] index out of range!");
+		}
 	};
 }
 

@@ -3,8 +3,10 @@
 
 #include "PreDefines.h"
 #include "Math.h"
-#include "Structures/Color.h"
 #include "Exception.h"
+#include "Structures/Color.h"
+#include "Structures/Vector.h"
+#include "Structures/Matrix.h"
 #include "Structures/PixelFormat.h"
 #include "Structures/PixelBuffer.h"
 

@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <cassert>
 
 namespace MyGL {
 	typedef signed char int8;
