@@ -21,7 +21,7 @@ namespace MyGL {
 			return Vector3(x() / _w, y() / _w, z() / _w);
 		}
 	}
-	Vector4 Vector4::OfPoint(Vector3 &v3) {
+	Vector4 Vector4::Of(Vector3 &v3) {
 		return Vector4(v3.x(), v3.y(), v3.z(), 1.0f);
 	}
 }

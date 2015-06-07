@@ -4,13 +4,11 @@
 using namespace MyGL;
 
 int main() {
-	Matrix3x3 matrix;
-	Vector3 v1(1, 1, 1);
-	Vector3 v2(2, 2, 2);
-	auto other = v1 + v2;
+	Vector4 v1(1, 1, 1);
+	auto result = Matrixs::Translate(0, 10, 0) * v1;
 	//Matrix4 matrix2(matrix);
 	//auto matrix3 = matrix * matrix2;
-	//std::cout << (matrix == matrix2) << std::endl;
+	std::cout << result.x() << ' ' << result.y() << ' ' << result.z() << std::endl;
 
 	SFMLContext context;
 	context.CreateWindow(800, 600, "title");

@@ -2,7 +2,6 @@
 #define _MYGL_CORE_STRUCTURES_MATRIX_H_
 
 #include "Vector.h"
-#include "../Interfaces/IClonable.h"
 
 namespace MyGL {
 	template<int R, int C>
@@ -47,7 +46,13 @@ namespace MyGL {
 		static const int kColNum = ROW_NUM;
 		static const int kRowNum = COL_NUM;
 
-		virtual ~Matrix() {}
+		Matrix() {
+			memset(&_values[0][0], 0, sizeof(_values));
+		}
+		Matrix(float value[kRowNum][kColNum]) {
+			memcpy(&_values[0][0], &value[0][0], sizeof(_values));
+		}
+		virtual ~Matrix() = 0;
 		matrix_type Clone() const;
 
 		void SetValues(float value[][COL_NUM]) {
@@ -101,14 +106,6 @@ namespace MyGL {
 		template<int T1, int T2, int T3>
 		friend typename MatrixTypeTraits<T1, T3>::matrix_type operator*(const Matrix<T1, T2> &lhs, const Matrix<T2, T3> &rhs);
 
-	protected:
-		Matrix() {
-			memset(&_values[0][0], 0, sizeof(_values));
-		}
-		Matrix(float value[kRowNum][kColNum]) {
-			memcpy(&_values[0][0], &value[0][0], sizeof(_values));
-		}
-
 	private:
 		float _values[ROW_NUM][COL_NUM];
 	};
@@ -129,6 +126,7 @@ namespace MyGL {
 					{ v30, v31, v32, v33 } };
 			SetValues(values);
 		}
+		override ~Matrix4x4() {}
 
 		Vector4 GetRowVector(int row) const {
 			auto rowData = GetRowArray(row);
@@ -154,6 +152,7 @@ namespace MyGL {
 					{ v20, v21, v22} };
 			SetValues(values);
 		}
+		override ~Matrix3x3() {}
 
 		Vector3 GetRowVector(int row) const {
 			auto rowData = GetRowArray(row);
@@ -179,6 +178,7 @@ namespace MyGL {
 					{ v20, v21, v22, v23 } };
 			SetValues(values);
 		}
+		override ~Matrix3x4() {}
 
 		Vector4 GetRowVector(int row) const {
 			auto rowData = GetRowArray(row);
@@ -206,6 +206,7 @@ namespace MyGL {
 					{ v30, v31, v32}};
 			SetValues(values);
 		}
+		override ~Matrix4x3() {}
 
 		Vector3 GetRowVector(int row) const {
 			auto rowData = GetRowArray(row);
@@ -229,9 +230,25 @@ namespace MyGL {
 		}
 		return matrix;
 	}
+	template<int R, int C>
+	typename Vector<R>::vector_type operator*(const Matrix<R, C> &lhs, typename Vector<C>::vector_type &rhs) {
+		typename Vector<R>::vector_type result;
+		for (int i = 0; i < R; i++) {
+			for (int j = 0; j < C; j++) {
+				result[i] += lhs[i][j] * rhs[j];
+			}
+		}
+		return result;
+	}
 
 	typedef Matrix4x4 Matrix4;
 	typedef Matrix3x3 Matrix3;
+
+	namespace Matrixs {
+		Matrix4 Translate(float x, float y, float z);
+		Matrix4 Scale(float x, float y, float z);
+		Matrix4 Scale(float scale);
+	}
 }
 
 #endif

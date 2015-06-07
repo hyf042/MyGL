@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include "../PreDefines.h"
-#include "../Interfaces/IClonable.h"
 #include "../Exception.h"
 #include "../Math.h"
 
@@ -142,7 +141,7 @@ namespace MyGL {
 	public:
 		Vector4() : base_type() {}
 		Vector4(float x, float y, float z) {
-			SetValue(x, y, z, 0);
+			SetValue(x, y, z, 1.0f);
 		}
 		Vector4(float x, float y, float z, float w) {
 			SetValue(x, y, z, w);
@@ -151,7 +150,8 @@ namespace MyGL {
 		Vector4(const Vector<OTHER_SIZE> &other) : base_type(other) {}
 		template<int OTHER_SIZE>
 		static Vector4 Of(const Vector<OTHER_SIZE> &other) { return Vector4(other); }
-		static Vector4 OfPoint(Vector3 &v3);
+		// Specialize for v3 -> v4, w = 1
+		static Vector4 Of(Vector3 &v3);
 		Vector3 AsVector3();
 
 		void SetValue(float x, float y, float z, float w) {
