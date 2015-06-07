@@ -5,12 +5,12 @@ namespace MyGL {
 	PixelBuffer::PixelBuffer(int width, int height) : PixelBuffer(width, height, PixelFormat()) {}
 
 	PixelBuffer::PixelBuffer(int width, int height, PixelFormat pixelFormat) {
-		m_width = width;
-		m_height = height;
-		m_pixels = vector<uint8>(width * height * 4);
+		_width = width;
+		_height = height;
+		_pixels = vector<uint8>(width * height * 4);
 	}
 
-	PixelBuffer PixelBuffer::clone() const {
+	PixelBuffer PixelBuffer::Clone() const {
 		return PixelBuffer(*this);
 	}
 }

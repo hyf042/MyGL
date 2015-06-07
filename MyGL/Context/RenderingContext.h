@@ -1,0 +1,23 @@
+#ifndef _MYGL_RENDERINGCONTEXT_RENDERINGCONTEXT_H_
+#define _MYGL_RENDERINGCONTEXT_RENDERINGCONTEXT_H_
+
+#include "../Core/PreDefines.h"
+#include "../Core/Structures/PixelBuffer.h"
+
+namespace MyGL {
+	class RenderingContext {
+	public:
+		virtual ~RenderingContext() {}
+
+		virtual int width() const = 0;
+		virtual int height() const = 0;
+
+		virtual void CreateWindow(int width, int height, const string &title) = 0;
+		
+		virtual void SwapBuffers();
+	protected:
+		virtual void FlushWindow(const PixelBuffer& buffer) = 0;
+	};
+}
+
+#endif

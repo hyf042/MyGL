@@ -1,8 +1,8 @@
-#ifndef _MYGL_COLOR_H_
-#define _MYGL_COLOR_H_
+#ifndef _MYGL_STRUCTURES_COLOR_H_
+#define _MYGL_STRUCTURES_COLOR_H_
 
-#include "Math.h"
-#include "PreDefines.h"
+#include "../Math.h"
+#include "../PreDefines.h"
 
 namespace MyGL {
 	struct Color {
@@ -15,28 +15,28 @@ namespace MyGL {
 		Color(float _r, float _g, float _b, float _a) : r(_r), g(_g), b(_b), a(_a) {}
 		Color(uint32 col) : a((col>>24)/255.0f), r((col>>16)/255.0f), g((col>>8)/255.0f), b((col&0xFF)/255.0f) {}
 
-		Color normalize() {
-			a = clamp(a, 0.f, 1.f);
-			r = clamp(r, 0.f, 1.f);
-			g = clamp(g, 0.f, 1.f);
-			b = clamp(b, 0.f, 1.f);
+		Color Normalize() {
+			a = Math::Clamp(a, 0.f, 1.f);
+			r = Math::Clamp(r, 0.f, 1.f);
+			g = Math::Clamp(g, 0.f, 1.f);
+			b = Math::Clamp(b, 0.f, 1.f);
 			return *this;
 		}
 
-		uint32 getDword() {
-			normalize();
+		uint32 GetDword() {
+			Normalize();
 			return ((uint8(a * 255.0f)) << 24) + ((uint8(r * 255.0f)) << 16) + ((uint8(g * 255.0f)) << 8) + ((uint8(b * 255.0f)) << 0);
 		}
 
-		void getBytes(uint8 &r, uint8 &g, uint8 &b, uint8 &a) {
-			a = clamp(uint32(this->a * 255.0f), 0u, 255u);
-			r = clamp(uint32(this->r * 255.0f), 0u, 255u);
-			g = clamp(uint32(this->g * 255.0f), 0u, 255u);
-			b = clamp(uint32(this->b * 255.0f), 0u, 255u);
+		void GetBytes(uint8 &r, uint8 &g, uint8 &b, uint8 &a) {
+			a = Math::Clamp(uint32(this->a * 255.0f), 0u, 255u);
+			r = Math::Clamp(uint32(this->r * 255.0f), 0u, 255u);
+			g = Math::Clamp(uint32(this->g * 255.0f), 0u, 255u);
+			b = Math::Clamp(uint32(this->b * 255.0f), 0u, 255u);
 		}
 
 		operator uint32() {
-			return getDword();
+			return GetDword();
 		}
 	};
 

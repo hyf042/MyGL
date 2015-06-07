@@ -1,16 +1,9 @@
-#ifndef _MYGL_PRE_DEFINES_H_
-#define _MYGL_PRE_DEFINES_H_
+#ifndef _MYGL_CORE_PREDEFINES_H_
+#define _MYGL_CORE_PREDEFINES_H_
 
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
-#include <set>
-#include <queue>
-#include <iostream>
-#include <cmath>
-#include <ctime>
-#include <exception>
 
 namespace MyGL {
 	typedef signed char int8;

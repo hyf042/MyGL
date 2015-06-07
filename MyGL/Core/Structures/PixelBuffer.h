@@ -1,0 +1,56 @@
+#ifndef _MYGL_STRUCTURES_PIXELBUFFER_H_
+#define _MYGL_STRUCTURES_PIXELBUFFER_H_
+
+#include "Color.h"
+#include "../PreDefines.h"
+
+namespace MyGL {
+	class PixelBuffer {
+	public:
+		PixelBuffer(int width, int height);
+		PixelBuffer(int width, int height, PixelFormat pixelFormat);
+
+		int width() const { return _width; }
+		int height() const { return _height; }
+
+		int GetIndex(int x, int y) {
+			return y * width() + x;
+		}
+
+		void SetData(int index, int elementIndex, uint8 byte) {
+			_pixels[(index << 2) + elementIndex] = byte;
+		}
+		void SetData(int x, int y, int elementIndex, uint8 byte) {
+			SetData(GetIndex(x, y), elementIndex, byte);
+		}
+		void SetColor(int index, Color color) {
+			uint8 r, g, b, a;
+			color.GetBytes(r, g, b, a);
+			_pixels[(index << 2) + 0] = r;
+			_pixels[(index << 2) + 1] = g;
+			_pixels[(index << 2) + 2] = b;
+			_pixels[(index << 2) + 3] = a;
+		}
+		void SetColor(int x, int y, Color color) {
+			SetColor(GetIndex(x, y), color);
+		}
+
+		const uint8* GetPixelRaw() const {
+			if (_pixels.size() > 0) {
+				return &_pixels[0];
+			}
+			else {
+				return nullptr;
+			}
+		}
+
+		PixelBuffer Clone() const;
+
+	private:
+		vector<uint8> _pixels;
+		int _width;
+		int _height;
+	};
+}
+
+#endif

@@ -1,14 +1,14 @@
-#include "Common.h"
 #include "GL.h"
+#include "Common.h"
 
 namespace MyGL {
-	void GL::flush() {}
+	void GL::Flush() {}
 
-	PixelBuffer GL::getBuffer(int width, int height) {
+	PixelBuffer GL::GetBuffer(int width, int height) {
 		PixelBuffer buffer(width, height);
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				buffer.setColor(i, j, Colors::Red);
+				buffer.SetColor(i, j, Colors::Red);
 			}
 		}
 		return buffer;

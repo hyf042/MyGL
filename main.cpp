@@ -6,8 +6,8 @@ using namespace MyGL;
 int main()
 {
 	SFMLContext context;
-	context.createWindow(800, 600, "title");
-	auto window = context.getWindow();
+	context.CreateWindow(800, 600, "title");
+	auto window = context.GetWindow();
 
 	while (window.lock()->isOpen())
 	{
@@ -18,7 +18,7 @@ int main()
 				window.lock()->close();
 		}
 
-		context.swapBuffers();
+		context.SwapBuffers();
 	}
 
 	return 0;
