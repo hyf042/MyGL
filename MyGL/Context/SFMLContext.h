@@ -16,6 +16,8 @@ namespace MyGL {
 		}
 
 		override void CreateWindow(int width, int height, const string& title) {
+			GL::Instance().Init(width, height);
+			
 			_window = make_shared<sf::RenderWindow>(sf::VideoMode(width, height), title);
 
 			_texture = make_shared<sf::Texture>();
@@ -27,8 +29,8 @@ namespace MyGL {
 			_sprite->setTexture(*_texture);
 		}
 
-		override void FlushWindow(const PixelBuffer& buffer) {
-			_texture->update(buffer.GetPixelRaw());
+		override void FlushWindow(shared_ptr<const PixelBuffer> buffer) {
+			_texture->update(buffer->GetPixelRaw());
 			_window->clear();
 			_window->draw(*_sprite);
 			_window->display();

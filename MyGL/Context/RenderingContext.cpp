@@ -4,7 +4,7 @@
 namespace MyGL {
 	void RenderingContext::SwapBuffers() {
 		GL::Instance().Flush();
-		const PixelBuffer &buffer = GL::Instance().GetBuffer(width(), height());
+		auto buffer = GL::Instance().GetBuffer();
 		FlushWindow(buffer);
 	}
 }

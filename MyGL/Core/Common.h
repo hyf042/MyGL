@@ -9,5 +9,6 @@
 #include "Structures/Matrix.h"
 #include "Structures/PixelFormat.h"
 #include "Structures/PixelBuffer.h"
+#include "Transforms.h"
 
 #endif

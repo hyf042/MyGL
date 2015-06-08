@@ -4,15 +4,16 @@
 using namespace MyGL;
 
 int main() {
-	Vector4 v1(1, 1, 1);
-	auto result = Matrixs::Translate(0, 10, 0) * v1;
-	//Matrix4 matrix2(matrix);
-	//auto matrix3 = matrix * matrix2;
-	std::cout << result.x() << ' ' << result.y() << ' ' << result.z() << std::endl;
-
 	SFMLContext context;
 	context.CreateWindow(800, 600, "title");
 	auto window = context.GetWindow();
+
+	auto point = Vector3::Zero();
+	GL::Instance().Translate(10, 0, 0);
+	GL::Instance().Scale(0.5f);
+	GL::Instance().Rotate(Math::Pi * .5f, Vectors::Forward);
+	point = GL::Instance().TestTransform(point);
+	std::cout << point << std::endl;
 
 	while (window.lock()->isOpen())
 	{
@@ -22,6 +23,8 @@ int main() {
 			if (event.type == sf::Event::Closed)
 				window.lock()->close();
 		}
+
+		GL::Instance().Clear();
 
 		context.SwapBuffers();
 	}

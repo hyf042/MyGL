@@ -19,6 +19,13 @@ namespace MyGL {
 			return y * width() + x;
 		}
 
+		void Clear(Color color) {
+			for (int i = 0; i < width(); i++) {
+				for (int j = 0; j < height(); j++) {
+					SetColor(i, j, color);
+				}
+			}
+		}
 		void SetData(int index, int elementIndex, uint8 byte) {
 			_pixels[(index << 2) + elementIndex] = byte;
 		}
@@ -46,7 +53,12 @@ namespace MyGL {
 			}
 		}
 
-		override shared_ptr<PixelBuffer> Clone() const;
+		override PixelBuffer Clone() const {
+			return PixelBuffer(*this);
+		}
+		override shared_ptr<PixelBuffer> ClonePtr() const {
+			return make_shared<PixelBuffer>(*this);
+		}
 
 	private:
 		vector<uint8> _pixels;

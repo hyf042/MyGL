@@ -2,12 +2,8 @@
 
 namespace MyGL {
 	template<int SIZE>
-	typename Vector<SIZE>::vector_type Vector<SIZE>::Clone() const {
-		return typename Vector<SIZE>::vector_type(*this);
-	}
-	template<int SIZE>
 	typename Vector<SIZE>::vector_type Vector<SIZE>::Normalized() const {
-		typename Vector<SIZE>::vector_type normalized = Clone();
+		auto normalized = Clone();
 		normalized.Normalize();
 		return normalized;
 	}
@@ -21,7 +17,10 @@ namespace MyGL {
 			return Vector3(x() / _w, y() / _w, z() / _w);
 		}
 	}
-	Vector4 Vector4::Of(Vector3 &v3) {
+	Vector4::operator Vector3() {
+		return  AsVector3();
+	}
+	Vector4 Vector4::Of(const Vector3 &v3) {
 		return Vector4(v3.x(), v3.y(), v3.z(), 1.0f);
 	}
 }

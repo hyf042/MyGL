@@ -2,44 +2,11 @@
 #define _MYGL_CORE_STRUCTURES_MATRIX_H_
 
 #include "Vector.h"
+#include "../Interfaces//IClonable.h"
 
 namespace MyGL {
-	template<int R, int C>
-	class Matrix;
-	class Matrix3x3;
-	class Matrix4x4;
-	class Matrix3x4;
-	class Matrix4x3;
-
-	template<int R, int C>
-	class MatrixTypeTraits {
-	public:
-		typedef Matrix<R, C> matrix_type;
-	};
-	template<>
-	class MatrixTypeTraits<4, 4> {
-	public:
-		typedef Matrix4x4 matrix_type;
-	};
-	template<>
-	class MatrixTypeTraits<3, 3> {
-	public:
-		typedef Matrix3x3 matrix_type;
-	};
-	template<>
-	class MatrixTypeTraits<3, 4> {
-	public:
-		typedef Matrix3x4 matrix_type;
-	};
-	template<>
-	class MatrixTypeTraits<4, 3> {
-	public:
-		typedef Matrix4x3 matrix_type;
-	};
-
 	template<int ROW_NUM, int COL_NUM>
-	class Matrix {
-		typedef typename MatrixTypeTraits<ROW_NUM, COL_NUM>::matrix_type matrix_type;
+	class Matrix : public IStringify, public IClonable<Matrix<ROW_NUM, COL_NUM>> {
 		typedef Matrix<ROW_NUM, COL_NUM> self_type;
 		typedef float row_array_type[COL_NUM];
 	public:
@@ -49,11 +16,40 @@ namespace MyGL {
 		Matrix() {
 			memset(&_values[0][0], 0, sizeof(_values));
 		}
-		Matrix(float value[kRowNum][kColNum]) {
+		Matrix(float value[ROW_NUM][COL_NUM]) {
 			memcpy(&_values[0][0], &value[0][0], sizeof(_values));
 		}
-		virtual ~Matrix() = 0;
-		matrix_type Clone() const;
+		virtual ~Matrix() {}
+		override self_type Clone() const {
+			return self_type(*this);
+		}
+		override shared_ptr<Matrix> ClonePtr() const {
+			return make_shared<Matrix>(*this);
+		}
+		override string ToString() const {
+			std::stringstream ss;
+			ss << "[";
+			for (int i = 0; i < ROW_NUM; i++) {
+				if (i != 0) {
+					ss << " ";
+				}
+				bool flag = false;
+				for (int j = 0; j < COL_NUM; j++) {
+					if (flag) {
+						ss << ", ";
+					}
+					else {
+						flag = true;
+					}
+					ss << setiosflags(std::ios::fixed) << std::setprecision(3) << std::setw(10) << _values[i][j];
+				}
+				if (i < ROW_NUM - 1) {
+					ss << std::endl;
+				}
+			}
+			ss << "]";
+			return ss.str();
+		}
 
 		void SetValues(float value[][COL_NUM]) {
 			memcpy(&_values[0][0], &value[0][0], sizeof(_values));
@@ -61,7 +57,15 @@ namespace MyGL {
 		inline int GetRowSize() const { return COL_NUM; }
 		inline int GetColSize() const { return ROW_NUM; }
 
-		matrix_type Transpose() const;
+		Matrix<COL_NUM, ROW_NUM> Transpose() const {
+			Matrix<COL_NUM, ROW_NUM> matrix;
+			for (int i = 0; i < ROW_NUM; i++) {
+				for (int j = 0; j < COL_NUM; j++) {
+					matrix[j][i] = _values[i][j];
+				}
+			}
+			return matrix;
+		}
 
 		vector<float> GetRowArray(int row) const {
 			vector<float> ret;
@@ -103,124 +107,31 @@ namespace MyGL {
 		friend bool operator!=(const Matrix &lhs, const Matrix &rhs) {
 			return !(lhs == rhs);
 		}
-		template<int T1, int T2, int T3>
-		friend typename MatrixTypeTraits<T1, T3>::matrix_type operator*(const Matrix<T1, T2> &lhs, const Matrix<T2, T3> &rhs);
+
+		typename VectorTypeTraits<COL_NUM>::vector_type GetRowVector(int row) const {
+			auto rowData = GetRowArray(row);
+			return typename VectorTypeTraits<COL_NUM>::vector_type(rowData);
+		}
+		typename VectorTypeTraits<ROW_NUM>::vector_type GetColVector(int col) const {
+			auto colData = GetColArray(col);
+			return typename VectorTypeTraits<ROW_NUM>::vector_type(colData);
+		}
+
+		static Matrix Identity() {
+			self_type matrix;
+			for (int i = 0; i < Math::Min(COL_NUM, ROW_NUM); i++) {
+				matrix[i][i] = 1;
+			}
+			return matrix;
+		}
 
 	private:
 		float _values[ROW_NUM][COL_NUM];
 	};
 
-	class Matrix4x4 : public Matrix<4, 4> {
-		typedef Matrix<4, 4> base_type;
-	public:
-		Matrix4x4() : base_type() {}
-		Matrix4x4(const Matrix<4, 4> &other) : base_type(other) {}
-		Matrix4x4(
-				float v00, float v01, float v02, float v03,
-				float v10, float v11, float v12, float v13,
-				float v20, float v21, float v22, float v23,
-				float v30, float v31, float v32, float v33) {
-			float values[][4] = { { v00, v01, v02, v03 },
-					{ v10, v11, v12, v13 },
-					{ v20, v21, v22, v23 },
-					{ v30, v31, v32, v33 } };
-			SetValues(values);
-		}
-		override ~Matrix4x4() {}
-
-		Vector4 GetRowVector(int row) const {
-			auto rowData = GetRowArray(row);
-			return Vector4(rowData[0], rowData[1], rowData[2], rowData[3]);
-		}
-		Vector4 GetColVector(int col) const {
-			auto colData = GetColArray(col);
-			return Vector4(colData[0], colData[1], colData[2], colData[3]);
-		}
-	};
-
-	class Matrix3x3 : public Matrix<3, 3> {
-		typedef Matrix<3, 3> base_type;
-	public:
-		Matrix3x3() : base_type() {}
-		Matrix3x3(const Matrix<3, 3> &other) : base_type(other) {}
-		Matrix3x3(
-				float v00, float v01, float v02,
-				float v10, float v11, float v12,
-				float v20, float v21, float v22) {
-			float values[][3] = { { v00, v01, v02 },
-					{ v10, v11, v12},
-					{ v20, v21, v22} };
-			SetValues(values);
-		}
-		override ~Matrix3x3() {}
-
-		Vector3 GetRowVector(int row) const {
-			auto rowData = GetRowArray(row);
-			return Vector3(rowData[0], rowData[1], rowData[2]);
-		}
-		Vector3 GetColVector(int col) const {
-			auto colData = GetColArray(col);
-			return Vector3(colData[0], colData[1], colData[2]);
-		}
-	};
-
-	class Matrix3x4 : public Matrix<3, 4> {
-		typedef Matrix<3, 4> base_type;
-	public:
-		Matrix3x4() : base_type() {}
-		Matrix3x4(const Matrix<3, 4> &other) : base_type(other) {}
-		Matrix3x4(
-				float v00, float v01, float v02, float v03,
-				float v10, float v11, float v12, float v13,
-				float v20, float v21, float v22, float v23) {
-			float values[][4] = { { v00, v01, v02, v03 },
-					{ v10, v11, v12, v13 },
-					{ v20, v21, v22, v23 } };
-			SetValues(values);
-		}
-		override ~Matrix3x4() {}
-
-		Vector4 GetRowVector(int row) const {
-			auto rowData = GetRowArray(row);
-			return Vector4(rowData[0], rowData[1], rowData[2], rowData[3]);
-		}
-		Vector3 GetColVector(int col) const {
-			auto colData = GetColArray(col);
-			return Vector3(colData[0], colData[1], colData[2]);
-		}
-	};
-
-	class Matrix4x3 : public Matrix<4, 3> {
-		typedef Matrix<4, 3> base_type;
-	public:
-		Matrix4x3() : base_type() {}
-		Matrix4x3(const Matrix<4, 3> &other) : base_type(other) {}
-		Matrix4x3(
-			float v00, float v01, float v02,
-			float v10, float v11, float v12,
-			float v20, float v21, float v22,
-			float v30, float v31, float v32) {
-			float values[][3] = { { v00, v01, v02 },
-					{ v10, v11, v12 },
-					{ v20, v21, v22 },
-					{ v30, v31, v32}};
-			SetValues(values);
-		}
-		override ~Matrix4x3() {}
-
-		Vector3 GetRowVector(int row) const {
-			auto rowData = GetRowArray(row);
-			return Vector3(rowData[0], rowData[1], rowData[2]);
-		}
-		Vector4 GetColVector(int col) const {
-			auto colData = GetColArray(col);
-			return Vector4(colData[0], colData[1], colData[2], colData[3]);
-		}
-	};
-
 	template<int T1, int T2, int T3>
-	typename MatrixTypeTraits<T1, T3>::matrix_type operator*(const Matrix<T1, T2> &lhs, const Matrix<T2, T3> &rhs) {
-		typename MatrixTypeTraits<T1, T3>::matrix_type matrix;
+	Matrix<T1, T3> operator*(const Matrix<T1, T2> &lhs, const Matrix<T2, T3> &rhs) {
+		Matrix<T1, T3> matrix;
 		for (int i = 0; i < T1; i++) {
 			for (int j = 0; j < T3; j++) {
 				for (int k = 0; k < T2; k++) {
@@ -230,6 +141,7 @@ namespace MyGL {
 		}
 		return matrix;
 	}
+
 	template<int R, int C>
 	typename Vector<R>::vector_type operator*(const Matrix<R, C> &lhs, typename Vector<C>::vector_type &rhs) {
 		typename Vector<R>::vector_type result;
@@ -240,14 +152,72 @@ namespace MyGL {
 		}
 		return result;
 	}
+	inline Vector4 operator*(const Matrix<4, 4> &lhs, const Vector3 &rhs) {
+		Vector4 v4 = Vector4::Of(rhs);
+		Vector4 result;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				result[i] += lhs[i][j] * v4[j];
+			}
+		}
+		return result;
+	}
 
+	typedef Matrix<4, 4> Matrix4x4;
+	typedef Matrix<3, 3> Matrix3x3;
+	typedef Matrix<3, 4> Matrix3x4;
+	typedef Matrix<4, 3> Matrix4x3;
 	typedef Matrix4x4 Matrix4;
 	typedef Matrix3x3 Matrix3;
 
 	namespace Matrixs {
-		Matrix4 Translate(float x, float y, float z);
-		Matrix4 Scale(float x, float y, float z);
-		Matrix4 Scale(float scale);
+		static Matrix4x4 CreateMatrix4x4(
+				float v00, float v01, float v02, float v03,
+				float v10, float v11, float v12, float v13,
+				float v20, float v21, float v22, float v23,
+				float v30, float v31, float v32, float v33) {
+			float values[][4] = {
+					{ v00, v01, v02, v03 },
+					{ v10, v11, v12, v13 },
+					{ v20, v21, v22, v23 },
+					{ v30, v31, v32, v33 } };
+			return Matrix4x4(values);
+		}
+
+		static Matrix3x3 CreateMatrix3x3(
+				float v00, float v01, float v02,
+				float v10, float v11, float v12,
+				float v20, float v21, float v22) {
+			float values[][3] = {
+					{ v00, v01, v02 },
+					{ v10, v11, v12 },
+					{ v20, v21, v22 } };
+			return Matrix3x3(values);
+		}
+
+		static Matrix3x4 CreateMatrix3x4(
+				float v00, float v01, float v02, float v03,
+				float v10, float v11, float v12, float v13,
+				float v20, float v21, float v22, float v23) {
+			float values[][4] = {
+					{ v00, v01, v02, v03 },
+					{ v10, v11, v12, v13 },
+					{ v20, v21, v22, v23 } };
+			return Matrix<3, 4>(values);
+		}
+
+		static Matrix4x3 CreateMatrix4x3(
+				float v00, float v01, float v02,
+				float v10, float v11, float v12,
+				float v20, float v21, float v22,
+				float v30, float v31, float v32) {
+			float values[][3] = {
+					{ v00, v01, v02 },
+					{ v10, v11, v12 },
+					{ v20, v21, v22 },
+					{ v30, v31, v32 } };
+			return Matrix4x3(values);
+		}
 	}
 }
 

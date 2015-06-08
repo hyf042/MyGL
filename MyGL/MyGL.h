@@ -3,6 +3,7 @@
 
 #include "Core/Common.h"
 #include "Core/GL.h"
+#include "Core/Transforms.h"
 #include "Context/SFMLContext.h"
 
 #endif

@@ -7,7 +7,8 @@ namespace MyGL {
 	template<typename T>
 	class IClonable {
 	public:
-		virtual shared_ptr<T> Clone() const = 0;
+		virtual T Clone() const = 0;
+		virtual shared_ptr<T> ClonePtr() const = 0;
 
 		virtual ~IClonable() {}
 	};

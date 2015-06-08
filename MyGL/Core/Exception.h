@@ -10,6 +10,10 @@ namespace MyGL {
 		static Exception IndexOutOfRangeException() {
 			return Exception("[MyGL] index out of range!");
 		}
+
+		static Exception NotImplementationException() {
+			return Exception("[MyGL] this is not implemention");
+		}
 	};
 }
 

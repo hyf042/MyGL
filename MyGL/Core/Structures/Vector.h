@@ -2,9 +2,13 @@
 #define _MYGL_CORE_VECTOR_H_
 
 #include <cmath>
+#include <iomanip>
+#include <sstream>
 #include "../PreDefines.h"
 #include "../Exception.h"
 #include "../Math.h"
+#include "../Interfaces/IStringify.h"
+#include "../Interfaces//IClonable.h"
 
 namespace MyGL {
 	template<int SIZE>
@@ -35,13 +39,47 @@ namespace MyGL {
 	};
 
 	template<int SIZE>
-	class Vector {
+	class Vector : public IStringify {
 	public:
 		typedef typename VectorTypeTraits<SIZE>::vector_type vector_type;
 
 		static const int kSize = SIZE;
 
-		vector_type Clone() const;
+		Vector() {
+			memset(_values, 0, sizeof(_values));
+		}
+		Vector(float values[SIZE]) {
+			memcpy(_values, values, sizeof(_values));
+		}
+		template<int OTHER_SIZE>
+		Vector(const Vector<OTHER_SIZE> &other) {
+			int size = Math::Min(SIZE, OTHER_SIZE);
+			for (int i = 0; i < size; i++) {
+				_values[i] = other[i];
+			}
+			for (int i = size; i < SIZE; i++) {
+				_values[i] = 0;
+			}
+		}
+		virtual ~Vector() = 0;
+
+		override string ToString() const {
+			std::stringstream ss;
+			ss << "[";
+			bool flag = false;
+			for (int i = 0; i < SIZE; i++) {
+				if (flag) {
+					ss << ", ";
+				}
+				else {
+					flag = true;
+				}
+				ss << setiosflags(std::ios::fixed) << std::setprecision(3) << std::setw(10) << _values[i];
+			}
+			ss << "]";
+			return ss.str();
+		}
+
 		inline float LengthSquare() const {
 			float sum = 0;
 			for (int i = 0; i < SIZE; i++) {
@@ -112,30 +150,16 @@ namespace MyGL {
 			return !(lhs == rhs);
 		}
 
-		vector_type Zero();
+		static vector_type Zero();
 
 	protected:
-		Vector() {
-			memset(_values, 0, sizeof(_values));
-		}
-		Vector(float values[SIZE]) {
-			memcpy(_values, values, sizeof(_values));
-		}
-		template<int OTHER_SIZE>
-		Vector(Vector<OTHER_SIZE> other) {
-			int size = Math::Min(SIZE, OTHER_SIZE);
-			for (int i = 0; i < size; i++) {
-				_values[i] = other._values[i];
-			}
-			for (int i = size; i < SIZE; i++) {
-				_values[i] = 0;
-			}
-		}
-
 		float _values[SIZE];
 	};
 
-	class Vector4 : public Vector<4> {
+	template<int SIZE>
+	Vector<SIZE>::~Vector() {}
+
+	class Vector4 : public Vector<4>, public IClonable<Vector4> {
 		typedef Vector<4> base_type;
 
 	public:
@@ -148,12 +172,17 @@ namespace MyGL {
 		}
 		template<int OTHER_SIZE>
 		Vector4(const Vector<OTHER_SIZE> &other) : base_type(other) {}
-		template<int OTHER_SIZE>
-		static Vector4 Of(const Vector<OTHER_SIZE> &other) { return Vector4(other); }
-		// Specialize for v3 -> v4, w = 1
-		static Vector4 Of(Vector3 &v3);
+		override ~Vector4() {}
+		static Vector4 Of(const Vector3 &v3);
+		operator Vector3();
 		Vector3 AsVector3();
 
+		override Vector4 Clone() const {
+			return Vector4(*this);
+		}
+		override shared_ptr<Vector4> ClonePtr() const {
+			return make_shared<Vector4>(*this);
+		}
 		void SetValue(float x, float y, float z, float w) {
 			_values[0] = x;
 			_values[1] = y;
@@ -187,7 +216,7 @@ namespace MyGL {
 		}
 	};
 
-	class Vector3 : public Vector<3> {
+	class Vector3 : public Vector<3>, public IClonable<Vector3> {
 		typedef Vector<3> base_type;
 
 	public:
@@ -197,9 +226,16 @@ namespace MyGL {
 		}
 		template<int OTHER_SIZE>
 		Vector3(const Vector<OTHER_SIZE> &other) : base_type(other) {}
+		override ~Vector3() {}
 		template<int OTHER_SIZE>
 		static Vector3 Of(const Vector<OTHER_SIZE> &other) { return Vector3(other); }
 
+		override Vector3 Clone() const {
+			return Vector3(*this);
+		}
+		override shared_ptr<Vector3> ClonePtr() const {
+			return make_shared<Vector3>(*this);
+		}
 		void SetValue(float x, float y, float z) {
 			_values[0] = x;
 			_values[1] = y;
@@ -230,7 +266,7 @@ namespace MyGL {
 		}
 	};
 
-	class Vector2 : public Vector<2> {
+	class Vector2 : public Vector<2>, public IClonable<Vector2> {
 		typedef Vector<2> base_type;
 
 	public:
@@ -240,9 +276,16 @@ namespace MyGL {
 		}
 		template<int OTHER_SIZE>
 		Vector2(const Vector<OTHER_SIZE> &other) : base_type(other) {}
+		override ~Vector2() {}
 		template<int OTHER_SIZE>
 		static Vector2 Of(const Vector<OTHER_SIZE> &other) { return Vector2(other); }
 
+		override Vector2 Clone() const {
+			return Vector4(*this);
+		}
+		override shared_ptr<Vector2> ClonePtr() const {
+			return make_shared<Vector2>(*this);
+		}
 		void SetValue(float x, float y) {
 			_values[0] = x;
 			_values[1] = y;
@@ -293,6 +336,15 @@ namespace MyGL {
 	template<int SIZE>
 	typename VectorTypeTraits<SIZE>::vector_type Vector<SIZE>::Zero() {
 		return typename VectorTypeTraits<SIZE>::vector_type();
+	}
+
+	namespace Vectors {
+		static Vector3 Up = Vector3(0, 1, 0);
+		static Vector3 Down = Vector3(0, -1, 0);
+		static Vector3 Forward = Vector3(0, 0, 1);
+		static Vector3 Back = Vector3(0, 0, -1);
+		static Vector3 Right = Vector3(1, 0, 0);
+		static Vector3 Left = Vector3(-1, 0, 0);
 	}
 }
 

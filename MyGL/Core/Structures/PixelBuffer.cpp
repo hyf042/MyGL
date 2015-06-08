@@ -9,8 +9,4 @@ namespace MyGL {
 		_height = height;
 		_pixels = vector<uint8>(width * height * 4);
 	}
-
-	shared_ptr<PixelBuffer> PixelBuffer::Clone() const {
-		return make_shared<PixelBuffer>(*this);
-	}
 }

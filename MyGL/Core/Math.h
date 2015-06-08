@@ -8,6 +8,8 @@ namespace MyGL {
 	public:
 		static const float kEpsilon;
 		static const float kEqualEpsilon;
+		static const float Pi;
+		static const float E;
 
 		template<typename T>
 		static inline T Clamp(T v, T min, T max) {
@@ -51,6 +53,30 @@ namespace MyGL {
 
 		static inline float Abs(float val) {
 			return abs(val);
+		}
+		static inline float Sin(float angle) {
+			return sinf(angle);
+		}
+		static inline float Cos(float angle) {
+			return cosf(angle);
+		}
+		static inline float Tan(float angle) {
+			return tanf(angle);
+		}
+		static inline float Cot(float angle) {
+			return 1 / tanf(angle);
+		}
+		static inline float Power(float base, float exponent) {
+			return powf(base, exponent);
+		}
+		static inline float Power(float exponent) {
+			return expf(exponent);
+		}
+		static inline float Degree2Radian(float degree) {
+			return degree * Pi / 180.0f;
+		}
+		static inline float Radian2Degree(float radian) {
+			return radian * 180.0f / Pi;
 		}
 	};
 }
