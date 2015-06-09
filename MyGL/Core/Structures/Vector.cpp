@@ -1,13 +1,6 @@
 #include "Vector.h"
 
 namespace MyGL {
-	template<int SIZE>
-	typename Vector<SIZE>::vector_type Vector<SIZE>::Normalized() const {
-		auto normalized = Clone();
-		normalized.Normalize();
-		return normalized;
-	}
-
 	Vector3 Vector4::AsVector3() {
 		float _w = w();
 		if (Math::IsZero(_w)) {

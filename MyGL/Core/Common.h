@@ -4,11 +4,14 @@
 #include "PreDefines.h"
 #include "Math.h"
 #include "Exception.h"
+#include "Consts.h"
 #include "Structures/Color.h"
 #include "Structures/Vector.h"
 #include "Structures/Matrix.h"
 #include "Structures/PixelFormat.h"
 #include "Structures/PixelBuffer.h"
+#include "GLState.h"
+#include "Clipping.h"
 #include "Transforms.h"
 
 #endif

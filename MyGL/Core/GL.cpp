@@ -16,22 +16,6 @@ namespace MyGL {
 		}
 	}
 
-	GL& GL::Translate(const Vector3& offset) {
-		_state.modelMatrix = Transforms::CreateTranslate(offset.x(), offset.y(), offset.z()) * _state.modelMatrix;
-		return *this;
-	}
-
-	GL& GL::Scale(const Vector3& scale) {
-		_state.modelMatrix = Transforms::CreateScale(scale.x(), scale.y(), scale.z()) * _state.modelMatrix;
-		return *this;
-	}
-
-	GL& GL::Rotate(float angle, Vector3 direction) {
-		_state.modelMatrix = Transforms::CreateRotation(angle, direction.x(), direction.y(), direction.z()) * _state.modelMatrix;
-		return *this;
-	}
-
-
 	void GL::ClearColor(Color color) {
 		_colorBuffer->Clear(color);
 	}

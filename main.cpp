@@ -8,10 +8,11 @@ int main() {
 	context.CreateWindow(800, 600, "title");
 	auto window = context.GetWindow();
 
-	auto point = Vector3::Zero();
-	GL::Instance().Translate(10, 0, 0);
-	GL::Instance().Scale(0.5f);
-	GL::Instance().Rotate(Math::Pi * .5f, Vectors::Forward);
+	auto point = Vector3(5, 5, 80);
+	Vector3 haha = point;
+	GL::Instance().LookAt(Vector3::Zero(), Vectors::Forward, Vectors::Up);
+	//GL::Instance().Perspective(Math::Pi * .25f, 800.0f / 600.0f, 0.1f, 100.0f);
+	GL::Instance().Ortho(-10, 10, -10, 10, 0.1f, 100);
 	point = GL::Instance().TestTransform(point);
 	std::cout << point << std::endl;
 
@@ -25,6 +26,7 @@ int main() {
 		}
 
 		GL::Instance().Clear();
+		GL::Instance().LoadIdentity();
 
 		context.SwapBuffers();
 	}

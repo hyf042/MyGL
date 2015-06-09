@@ -80,6 +80,10 @@ namespace MyGL {
 			return ss.str();
 		}
 
+		inline Vector& Assign(const Vector &other) {
+			memcpy(_values, other._values, sizeof(_values));
+			return *this;
+		}
 		inline float LengthSquare() const {
 			float sum = 0;
 			for (int i = 0; i < SIZE; i++) {
@@ -99,7 +103,6 @@ namespace MyGL {
 				_values[i] /= length;
 			}
 		}
-		vector_type Normalized() const;
 
 		float& operator[](int index) {
 			if (index < 0 || index >= kSize) {
@@ -112,6 +115,9 @@ namespace MyGL {
 				throw Exception::IndexOutOfRangeException();
 			}
 			return _values[index];
+		}
+		Vector& operator=(const Vector &other) {
+			return Assign(other);
 		}
 		Vector& operator+=(const Vector &other) {
 			for (int i = 0; i < SIZE; i++) {
@@ -159,35 +165,38 @@ namespace MyGL {
 	template<int SIZE>
 	Vector<SIZE>::~Vector() {}
 
-	class Vector4 : public Vector<4>, public IClonable<Vector4> {
-		typedef Vector<4> base_type;
+	class Vector2 : public Vector<2>, public IClonable<Vector2> {
+		typedef Vector<2> base_type;
 
 	public:
-		Vector4() : base_type() {}
-		Vector4(float x, float y, float z) {
-			SetValue(x, y, z, 1.0f);
-		}
-		Vector4(float x, float y, float z, float w) {
-			SetValue(x, y, z, w);
+		Vector2() : base_type() {}
+		Vector2(float x, float y) {
+			SetValue(x, y);
 		}
 		template<int OTHER_SIZE>
-		Vector4(const Vector<OTHER_SIZE> &other) : base_type(other) {}
-		override ~Vector4() {}
-		static Vector4 Of(const Vector3 &v3);
-		operator Vector3();
-		Vector3 AsVector3();
+		explicit Vector2(const Vector<OTHER_SIZE> &other) : base_type(other) {}
+		override ~Vector2() {}
+		template<int OTHER_SIZE>
+		static Vector2 Of(const Vector<OTHER_SIZE> &other) { return Vector2(other); }
 
-		override Vector4 Clone() const {
-			return Vector4(*this);
+		Vector2 Unit() {
+			auto normalized = Clone();
+			normalized.Normalize();
+			return normalized;
 		}
-		override shared_ptr<Vector4> ClonePtr() const {
-			return make_shared<Vector4>(*this);
+		override Vector2 Clone() const {
+			return Vector2(*this);
 		}
-		void SetValue(float x, float y, float z, float w) {
+		override shared_ptr<Vector2> ClonePtr() const {
+			return make_shared<Vector2>(*this);
+		}
+		void SetValue(float x, float y) {
 			_values[0] = x;
 			_values[1] = y;
-			_values[2] = z;
-			_values[3] = w;
+		}
+
+		friend float Cross(const Vector2 &lhs, const Vector2 &rhs) {
+			return lhs.x() * rhs.y() - lhs.y() * rhs.x();
 		}
 
 		inline float x() const {
@@ -196,23 +205,11 @@ namespace MyGL {
 		inline float y() const {
 			return _values[1];
 		}
-		inline float z() const {
-			return _values[2];
-		}
-		inline float w() const {
-			return _values[3];
-		}
 		inline void set_x(float x) {
 			_values[0] = x;
 		}
 		inline void set_y(float y) {
 			_values[1] = y;
-		}
-		inline void set_z(float z) {
-			_values[2] = z;
-		}
-		inline void set_w(float w) {
-			_values[3] = w;
 		}
 	};
 
@@ -225,11 +222,16 @@ namespace MyGL {
 			SetValue(x, y, z);
 		}
 		template<int OTHER_SIZE>
-		Vector3(const Vector<OTHER_SIZE> &other) : base_type(other) {}
+		explicit Vector3(const Vector<OTHER_SIZE> &other) : base_type(other) {}
 		override ~Vector3() {}
 		template<int OTHER_SIZE>
 		static Vector3 Of(const Vector<OTHER_SIZE> &other) { return Vector3(other); }
 
+		Vector3 Unit() {
+			auto normalized = Clone();
+			normalized.Normalize();
+			return normalized;
+		}
 		override Vector3 Clone() const {
 			return Vector3(*this);
 		}
@@ -266,33 +268,46 @@ namespace MyGL {
 		}
 	};
 
-	class Vector2 : public Vector<2>, public IClonable<Vector2> {
-		typedef Vector<2> base_type;
+	class Vector4 : public Vector<4>, public IClonable<Vector4> {
+		typedef Vector<4> base_type;
 
 	public:
-		Vector2() : base_type() {}
-		Vector2(float x, float y) {
-			SetValue(x, y);
+		Vector4() : base_type() {}
+		Vector4(float x, float y, float z) {
+			SetValue(x, y, z, 1.0f);
+		}
+		Vector4(float x, float y, float z, float w) {
+			SetValue(x, y, z, w);
 		}
 		template<int OTHER_SIZE>
-		Vector2(const Vector<OTHER_SIZE> &other) : base_type(other) {}
-		override ~Vector2() {}
-		template<int OTHER_SIZE>
-		static Vector2 Of(const Vector<OTHER_SIZE> &other) { return Vector2(other); }
+		explicit Vector4(const Vector<OTHER_SIZE> &other) : base_type(other) {}
+		override ~Vector4() {}
+		static Vector4 Of(const Vector3 &v3);
+		operator Vector3();
+		Vector3 AsVector3();
 
-		override Vector2 Clone() const {
+		Vector4 Unit() {
+			auto normalized = Clone();
+			normalized.Normalize();
+			return normalized;
+		}
+		override Vector4 Clone() const {
 			return Vector4(*this);
 		}
-		override shared_ptr<Vector2> ClonePtr() const {
-			return make_shared<Vector2>(*this);
+		override shared_ptr<Vector4> ClonePtr() const {
+			return make_shared<Vector4>(*this);
 		}
-		void SetValue(float x, float y) {
+		void SetValue(float x, float y, float z, float w) {
 			_values[0] = x;
 			_values[1] = y;
+			_values[2] = z;
+			_values[3] = w;
 		}
-
-		friend float Cross(const Vector2 &lhs, const Vector2 &rhs) {
-			return lhs.x() * rhs.y() - lhs.y() * rhs.x();
+		void SetRect(float x, float y, float w, float h) {
+			SetValue(x, y, x + w, y + h);
+		}
+		void SetSize(float w, float h) {
+			SetValue(x(), y(), x() + w, y() + h);
 		}
 
 		inline float x() const {
@@ -301,13 +316,76 @@ namespace MyGL {
 		inline float y() const {
 			return _values[1];
 		}
+		inline float z() const {
+			return _values[2];
+		}
+		inline float w() const {
+			return _values[3];
+		}
 		inline void set_x(float x) {
 			_values[0] = x;
 		}
 		inline void set_y(float y) {
 			_values[1] = y;
 		}
+		inline void set_z(float z) {
+			_values[2] = z;
+		}
+		inline void set_w(float w) {
+			_values[3] = w;
+		}
+
+		inline float left() const {
+			return _values[0];
+		}
+		inline float bottom() const {
+			return _values[1];
+		}
+		inline float right() const {
+			return _values[2];
+		}
+		inline float top() const {
+			return _values[3];
+		}
+		inline float width() const {
+			return right() - left();
+		}
+		inline float height() const {
+			return top() - bottom();
+		}
+		inline Vector2 center() const {
+			return Vector2(x() + width() * .5f, y() + height() * .5f);
+		}
+		inline void set_left(float val) {
+			_values[0] = val;
+		}
+		inline void set_bottom(float val) {
+			_values[1] = val;
+		}
+		inline void set_right(float val) {
+			_values[2] = val;
+		}
+		inline void set_top(float val) {
+			_values[3] = val;
+		}
+		inline void set_width(float val) {
+			set_right(left() + val);
+		}
+		inline void set_height(float val) {
+			set_top(bottom() + val);
+		}
+		inline void set_center(float x, float y) {
+			SetRect(x - width() * .5f, y - height() * .5f, width(), height());
+		}
+
+		static Vector4 MakeRect(float x, float y, float w, float h) {
+			return Vector4(x, y, x + w, y + h);
+		}
+		static Vector4 MinMaxRect(float minX, float minY, float maxX, float maxY) {
+			return Vector4(minX, minY, maxX, maxY);
+		}
 	};
+	typedef Vector4 Rect;
 
 	template<int SIZE>
 	typename VectorTypeTraits<SIZE>::vector_type operator+(const Vector<SIZE> &lhs, const Vector<SIZE> &rhs) {
@@ -317,7 +395,7 @@ namespace MyGL {
 	}
 	template<int SIZE>
 	typename VectorTypeTraits<SIZE>::vector_type operator-(const Vector<SIZE> &lhs, const Vector<SIZE> &rhs) {
-		typename VectorTypeTraits<SIZE>::vector_type ret = lhs;
+		typename VectorTypeTraits<SIZE>::vector_type ret(lhs);
 		ret -= rhs;
 		return ret;
 	}
