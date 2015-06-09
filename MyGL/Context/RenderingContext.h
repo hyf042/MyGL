@@ -16,7 +16,7 @@ namespace MyGL {
 		
 		virtual void SwapBuffers();
 	protected:
-		virtual void FlushWindow(shared_ptr<const PixelBuffer> buffer) = 0;
+		virtual void FlushWindow(weak_ptr<const PixelBuffer> buffer) = 0;
 	};
 }
 

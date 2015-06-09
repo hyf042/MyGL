@@ -29,8 +29,8 @@ namespace MyGL {
 			_sprite->setTexture(*_texture);
 		}
 
-		override void FlushWindow(shared_ptr<const PixelBuffer> buffer) {
-			_texture->update(buffer->GetPixelRaw());
+		override void FlushWindow(weak_ptr<const PixelBuffer> buffer) {
+			_texture->update(buffer.lock()->GetPixelRaw());
 			_window->clear();
 			_window->draw(*_sprite);
 			_window->display();

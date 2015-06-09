@@ -157,7 +157,7 @@ namespace MyGL {
 		}
 
 		static vector_type Zero();
-
+		static vector_type Lerp(const Vector &a, const Vector &b, float ratio);
 	protected:
 		float _values[SIZE];
 	};
@@ -389,7 +389,7 @@ namespace MyGL {
 
 	template<int SIZE>
 	typename VectorTypeTraits<SIZE>::vector_type operator+(const Vector<SIZE> &lhs, const Vector<SIZE> &rhs) {
-		typename VectorTypeTraits<SIZE>::vector_type ret =lhs;
+		typename VectorTypeTraits<SIZE>::vector_type ret(lhs);
 		ret += rhs;
 		return ret;
 	}
@@ -401,7 +401,7 @@ namespace MyGL {
 	}
 	template<int SIZE>
 	typename VectorTypeTraits<SIZE>::vector_type operator*(const Vector<SIZE> &lhs, float rhs) {
-		typename VectorTypeTraits<SIZE>::vector_type ret = lhs;
+		typename VectorTypeTraits<SIZE>::vector_type ret(lhs);
 		ret *= rhs;
 		return ret;
 	}
@@ -414,6 +414,10 @@ namespace MyGL {
 	template<int SIZE>
 	typename VectorTypeTraits<SIZE>::vector_type Vector<SIZE>::Zero() {
 		return typename VectorTypeTraits<SIZE>::vector_type();
+	}
+	template<int SIZE>
+	typename VectorTypeTraits<SIZE>::vector_type Vector<SIZE>::Lerp(const Vector<SIZE> &a, const Vector<SIZE> &b, float ratio) {
+		return a + (b - a) * ratio;
 	}
 
 	namespace Vectors {

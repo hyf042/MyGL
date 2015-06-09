@@ -2,7 +2,9 @@
 #define _MYGL_CORE_GL_H_
 
 #include "Common.h"
+#include "Vertex.h"
 #include "MatrixWrapper.h"
+#include "PrimitivesBuilder.h"
 
 namespace MyGL {
 	class GL {
@@ -19,9 +21,13 @@ namespace MyGL {
 
 		void Clear(bool colorBuffer = true, bool depthBuffer = false, bool stencilBuffer = false);
 		void ClearColor(Color color);
+		void ClearColor();
 		void ClearDepth() { throw Exception::NotImplementationException(); }
 		void ClearStencil() { throw Exception::NotImplementationException(); }
 
+		/*
+		 * Matrixs and Transforms
+		 **/
 		void MatrixMode(MatrixMode matrixMode) {
 			switch (matrixMode) {
 			case GL_MODEVIEW:
@@ -85,21 +91,95 @@ namespace MyGL {
 			return _state.GetCurrentMatrix().get_matrix();
 		}
 
+		/*
+		 * Primitives
+		 **/
+		GL& Begin(PrimitivesType mode) {
+			if (_primitvesBuilder) {
+				throw Exception("[MyGL] you should only build one primitives at a time!", Exception::kWarning);
+			}
+			_primitvesBuilder = PrimitivesBuilder::Begin(mode);
+			return *this;
+		}
+		GL& End() {
+			auto primitives = _primitvesBuilder->Build();
+			_primitvesBuilder.release();
+			if (!primitives->ValidateVertices()) {
+				primitives.release();
+				throw Exception("[MyGL] the vertices just built has some problems.", Exception::kWarning);
+			}
+			_drawCalls.push_back(make_unique<DrawCall>(primitives));
+			return *this;
+		}
+		GL& SetColor(float r, float g, float b, float a = 1.0f) {
+			return SetColor(Color(r, g, b, a));
+		}
+		GL& SetColor(const Color &color) {
+			_state.vertexColor = color;
+			return *this;
+		}
+		GL& SetUV(float u, float v) {
+			return SetUV(Vector2(u, v));
+		}
+		GL& SetUV(const Vector2 &uv) {
+			_state.vertexUV = uv;
+			return *this;
+		}
+		GL& AddVertex(float x, float y, float z) {
+			return AddVertex(Vector3(x, y, z));
+		}
+		GL& AddVertex(const Vector3 &position) {
+			auto viewport_position = _state.ModelToViewport(position);
+			_primitvesBuilder->AddVertex(Vertex(viewport_position, _state.vertexColor, _state.vertexUV));
+			return *this;
+		}
+
+		/*
+		 * Flags & Settings
+		 **/
+		GL& CullFace(CullFaceMask cullFace) {
+			_state.cullFace = cullFace;
+			return *this;
+		}
+		GL& FrontFace(Clockwise frontFace) {
+			_state.frontFace = frontFace;
+			return *this;
+		}
+
 		// Test
 		Vector3 TestTransform(Vector3 point) {
 			return _state.ModelToViewport(point);
 		}
 
 		void Flush();
-		shared_ptr<const PixelBuffer> GetBuffer();
+		const GLState& getState() const {
+			return _state;
+		}
+		weak_ptr<const PixelBuffer> GetBuffer();
+		weak_ptr<Clipping> GetClipping() {
+			return _clipping;
+		}
+
+		inline int width() const {
+			return _colorBuffer->width();
+		}
+		inline int height() const {
+			return _colorBuffer->height();
+		}
 
 	private:
-		GL() {}
+		GL() : _clipping(new Clipping()) {}
 		MatrixWrapper& _GetCurrentMatrixWrapper() {
 			return _state.GetCurrentMatrix();
 		}
-
+		void _DoDrawCall(const unique_ptr<DrawCall> &drawCall);
+		
 		GLState _state;
+
+		// all draw calls.
+		vector<unique_ptr<DrawCall>> _drawCalls;
+
+		unique_ptr<PrimitivesBuilder> _primitvesBuilder;
 		shared_ptr<Clipping> _clipping;
 		shared_ptr<PixelBuffer> _colorBuffer;
 		shared_ptr<PixelBuffer> _depthBuffer;

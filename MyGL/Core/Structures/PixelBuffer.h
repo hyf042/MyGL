@@ -20,12 +20,9 @@ namespace MyGL {
 		}
 
 		void Clear(Color color) {
-			for (int i = 0; i < width(); i++) {
-				for (int j = 0; j < height(); j++) {
-					SetColor(i, j, color);
-				}
-			}
+			memset(&_pixels[0], color.GetDword(), sizeof(uint32) * width() * height());
 		}
+
 		void SetData(int index, int elementIndex, uint8 byte) {
 			_pixels[(index << 2) + elementIndex] = byte;
 		}

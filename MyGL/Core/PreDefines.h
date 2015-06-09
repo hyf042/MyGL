@@ -26,16 +26,16 @@ namespace MyGL {
 	typedef wchar_t wchar;
 
 	using std::shared_ptr;
+	using std::unique_ptr;
 	using std::weak_ptr;
 	using std::make_shared;
+	using std::make_unique;
 	using std::vector;
 
 	class Exception;
 
 	class PixelFormat;
 	class PixelBuffer;
-
-	class MyGL;
 
 	class RenderingContext;
 

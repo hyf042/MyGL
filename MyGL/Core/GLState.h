@@ -3,6 +3,7 @@
 
 #include "Consts.h"
 #include "MatrixWrapper.h"
+#include "DrawCall.h"
 
 namespace MyGL {
 	// Restores the state of MyGL, includes all settings, matrixs, etc.
@@ -16,8 +17,22 @@ namespace MyGL {
 		Matrix4 viewportMatrix;
 		// current matrix mode.
 		MatrixMode matrixMode;
+		// current vertex color.
+		Color vertexColor;
+		// current vertex uv.
+		Vector2 vertexUV;
+		// mask of cull face.
+		CullFaceMask cullFace;
+		// indicate which is front face.
+		Clockwise frontFace;
 
-		GLState() : matrixMode(GL_MODEVIEW) {}
+		GLState() : 
+			matrixMode(GL_MODEVIEW), 
+			vertexColor(Colors::White),
+			vertexUV(),
+			cullFace(GL_BACK),
+			frontFace(GL_CCW)
+		{}
 
 		void LoadIdentity() {
 			modelViewMatrix.LoadIdentity();

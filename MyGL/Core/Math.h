@@ -2,6 +2,7 @@
 #define _MYGL_CORE_MATH_H_
 
 #include <cmath>
+#include <utility>
 
 namespace MyGL {
 	class Math {
@@ -50,6 +51,22 @@ namespace MyGL {
 		static inline bool LessOrEqual(float lhs, float rhs) {
 			return rhs - lhs > -kEqualEpsilon;
 		}
+		static inline bool InRange(float val, float left, float right) {
+			if (left > right) {
+				std::swap(left, right);
+			}
+			return GreaterOrEqual(val, left) && LessOrEqual(val, right);
+		}
+		static inline bool InRange(int val, int left, int right) {
+			return val >= left && val <= right;
+		}
+
+		static inline float Ceil(float val) {
+			return ceilf(val);
+		}
+		static inline float Floor(float val) {
+			return floorf(val);
+		}
 
 		static inline float Abs(float val) {
 			return abs(val);
@@ -77,6 +94,10 @@ namespace MyGL {
 		}
 		static inline float Radian2Degree(float radian) {
 			return radian * 180.0f / Pi;
+		}
+
+		static inline float Lerp(float from, float to, float ratio) {
+			return from + (to - from) * ratio;
 		}
 	};
 }

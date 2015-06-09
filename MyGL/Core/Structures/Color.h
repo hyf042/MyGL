@@ -5,38 +5,57 @@
 #include "../PreDefines.h"
 
 namespace MyGL {
-	struct Color {
-		float a, r, g, b;
-
-		Color(int _r, int _g, int _b) : r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f), a(1.0f) {}
-		Color(int _r, int _g, int _b, int _a) : r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f), a(_a / 255.0f) {}
-		Color(float _r, float _g, float _b) : r(_r), g(_g), b(_b), a(1.0f) {}
-		Color(float _r, float _g, float _b, float _a) : r(_r), g(_g), b(_b), a(_a) {}
-		Color(uint32 col) : a((col>>24)/255.0f), r((col>>16)/255.0f), g((col>>8)/255.0f), b((col&0xFF)/255.0f) {}
+	class Color {
+	public:
+		Color(int _r, int _g, int _b) : _r(_r / 255.0f), _g(_g / 255.0f), _b(_b / 255.0f), _a(1.0f) {}
+		Color(int _r, int _g, int _b, int _a) : _r(_r / 255.0f), _g(_g / 255.0f), _b(_b / 255.0f), _a(_a / 255.0f) {}
+		Color(float _r, float _g, float _b) : _r(_r), _g(_g), _b(_b), _a(1.0f) {}
+		Color(float _r, float _g, float _b, float _a) : _r(_r), _g(_g), _b(_b), _a(_a) {}
+		Color(uint32 col) : _a(((col>>24)&0xff)/255.0f), _r(((col>>16)&0xff)/255.0f), _g(((col>>8)&0xff)/255.0f), _b(((col&0xFF)&0xff)/255.0f) {}
 
 		Color Normalize() {
-			a = Math::Clamp(a, 0.f, 1.f);
-			r = Math::Clamp(r, 0.f, 1.f);
-			g = Math::Clamp(g, 0.f, 1.f);
-			b = Math::Clamp(b, 0.f, 1.f);
+			_a = Math::Clamp(_a, 0.f, 1.f);
+			_r = Math::Clamp(_r, 0.f, 1.f);
+			_g = Math::Clamp(_g, 0.f, 1.f);
+			_b = Math::Clamp(_b, 0.f, 1.f);
 			return *this;
 		}
 
 		uint32 GetDword() {
 			Normalize();
-			return ((uint8(a * 255.0f)) << 24) + ((uint8(r * 255.0f)) << 16) + ((uint8(g * 255.0f)) << 8) + ((uint8(b * 255.0f)) << 0);
+			return ((uint8(_a * 255.0f)) << 24) + ((uint8(_r * 255.0f)) << 16) + ((uint8(_g * 255.0f)) << 8) + ((uint8(_b * 255.0f)) << 0);
 		}
 
 		void GetBytes(uint8 &r, uint8 &g, uint8 &b, uint8 &a) {
-			a = Math::Clamp(uint32(this->a * 255.0f), 0u, 255u);
-			r = Math::Clamp(uint32(this->r * 255.0f), 0u, 255u);
-			g = Math::Clamp(uint32(this->g * 255.0f), 0u, 255u);
-			b = Math::Clamp(uint32(this->b * 255.0f), 0u, 255u);
+			a = Math::Clamp(uint32(this->_a * 255.0f), 0u, 255u);
+			r = Math::Clamp(uint32(this->_r * 255.0f), 0u, 255u);
+			g = Math::Clamp(uint32(this->_g * 255.0f), 0u, 255u);
+			b = Math::Clamp(uint32(this->_b * 255.0f), 0u, 255u);
 		}
 
 		operator uint32() {
 			return GetDword();
 		}
+
+		inline float a() const { return _a; }
+		inline float r() const { return _r; }
+		inline float g() const { return _g; }
+		inline float b() const { return _b; }
+		inline void set_a(float val) { _a = val; }
+		inline void set_r(float val) { _r = val; }
+		inline void set_g(float val) { _g = val; }
+		inline void set_b(float val) { _b = val; }
+
+		static Color Lerp(const Color &from, const Color &to, float ratio) {
+			return Color(
+				Math::Lerp(from._r, to._r, ratio),
+				Math::Lerp(from._g, to._g, ratio),
+				Math::Lerp(from._b, to._b, ratio),
+				Math::Lerp(from._a, to._a, ratio));
+		}
+
+	private:
+		float _a, _r, _g, _b;
 	};
 
 	namespace Colors {

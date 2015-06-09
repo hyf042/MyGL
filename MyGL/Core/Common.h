@@ -13,5 +13,6 @@
 #include "GLState.h"
 #include "Clipping.h"
 #include "Transforms.h"
+#include "Primitives.h"
 
 #endif
