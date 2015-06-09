@@ -3,7 +3,7 @@
 
 using namespace MyGL;
 
-void OnDrawScene(float deltaTime) {
+void OnDrawScene(float time) {
 	auto &gl = GL::Instance();
 
 	gl.Clear();
@@ -12,8 +12,8 @@ void OnDrawScene(float deltaTime) {
 	gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
 	gl.Perspective(Math::Pi * .25f, 800.0f / 600.0f, 0.1f, 100.0f);
 
-	gl.Scale(1 + 1 * Math::Sin(deltaTime * Math::Pi));
-	gl.Translate(0, 0, 30.0f);
+	gl.Rotate(Math::Pi * time, Vectors::Forward);
+	gl.Translate(0, 0, 20.0f);
 
 	gl
 		.Begin(GL_TRIANGLES)
@@ -43,7 +43,8 @@ int main() {
 		auto window = context.GetWindow();
 
 		int frame_count = 0;
-		sf::Clock elapsed;
+		sf::Clock fps_elapsed;
+		sf::Clock timer;
 		float last_time = 0;
 
 		while (window.lock()->isOpen())
@@ -56,16 +57,15 @@ int main() {
 			}
 
 			// show fps
-			auto current_time = elapsed.getElapsedTime();
+			auto current_time = fps_elapsed.getElapsedTime();
 			if (current_time.asSeconds() >= 1.0f) {
 				std::cout << "FPS: " << frame_count << std::endl;
 				frame_count = 0;
-				elapsed.restart();
+				fps_elapsed.restart();
 			}
 
 			frame_count++;
-			OnDrawScene(current_time.asSeconds() - last_time);
-			last_time = current_time.asSeconds();
+			OnDrawScene(timer.getElapsedTime().asSeconds());
 
 			context.SwapBuffers();
 		}
