@@ -21,7 +21,10 @@ namespace MyGL {
 		return MakeScale(scale, scale, scale);
 	}
 
-	Matrix4 Transforms::MakeRotation(float angle, float x, float y, float z) {
+	Matrix4 Transforms::MakeRotation(float angle, Vector3 direction) {
+		angle = Math::Degree2Radian(angle);
+		direction.Normalize();
+		float x = direction.x(), y = direction.y(), z = direction.z();
 		float cos = Math::Cos(angle);
 		float one_minus_cos = 1 - cos;
 		float sin = Math::Sin(angle);
@@ -63,6 +66,7 @@ namespace MyGL {
 	Matrix4 Transforms::MakePerspectiveFov(float fovy, float aspect, float zNear, float zFar) {
 		assert(zNear <= zFar);
 
+		fovy = Math::Degree2Radian(fovy);
 		float cot = Math::Cot(fovy * .5f);
 		float distZ = zFar - zNear;
 		return Matrixs::CreateMatrix4x4(

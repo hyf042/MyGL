@@ -21,6 +21,8 @@ namespace MyGL {
 		Color vertexColor;
 		// current vertex uv.
 		Vector2 vertexUV;
+		// current vertex normal.
+		Vector3 vertexNormal;
 		// mask of cull face.
 		CullFaceMask cullFace;
 		// indicate which is front face.
@@ -55,8 +57,8 @@ namespace MyGL {
 		}
 
 		Vector3 ModelToViewport(Vector3 point) {
-			Vector4 vec = projectionMatrix.get_matrix() * modelViewMatrix.get_matrix() * point;
-			return viewportMatrix * vec;
+			Vector4 vec = modelViewMatrix.get_matrix() * point;
+			return viewportMatrix * projectionMatrix.get_matrix() * vec;
 		}
 		Vector3 ModelToCameraSpace(Vector3 point) {
 			return modelViewMatrix.get_matrix() * point;

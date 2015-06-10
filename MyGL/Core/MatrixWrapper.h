@@ -24,7 +24,7 @@ namespace MyGL {
 			return Translate(Vector3(x, y, z));
 		}
 		MatrixWrapper& Translate(const Vector3 &offset) {
-			_matrix = Transforms::MakeTranslate(offset.x(), offset.y(), offset.z()) * _matrix;
+			_matrix = _matrix * Transforms::MakeTranslate(offset.x(), offset.y(), offset.z());
 			return *this;
 		}
 		MatrixWrapper& Scale(float x, float y, float z) {
@@ -34,7 +34,7 @@ namespace MyGL {
 			return Scale(Vector3(scale, scale, scale));
 		}
 		MatrixWrapper& Scale(const Vector3 &scale) {
-			_matrix = Transforms::MakeScale(scale.x(), scale.y(), scale.z()) * _matrix;
+			_matrix = _matrix * Transforms::MakeScale(scale.x(), scale.y(), scale.z());
 			return *this;
 		}
 
@@ -42,7 +42,7 @@ namespace MyGL {
 			return Rotate(angle, Vector3(x, y, z));
 		}
 		MatrixWrapper& Rotate(float angle, Vector3 direction) {
-			_matrix = Transforms::MakeRotation(angle, direction.x(), direction.y(), direction.z()) * _matrix;
+			_matrix = _matrix * Transforms::MakeRotation(angle, direction.x(), direction.y(), direction.z());
 			return *this;
 		}
 
@@ -60,7 +60,7 @@ namespace MyGL {
 		}
 
 		MatrixWrapper& Multiply(const Matrix4 &left) {
-			_matrix = left * _matrix;
+			_matrix = _matrix * left;
 			return *this;
 		}
 

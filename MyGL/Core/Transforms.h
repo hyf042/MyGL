@@ -15,10 +15,10 @@ namespace MyGL {
 		static Matrix4 MakeScale(Vector3 scale) {
 			return MakeScale(scale.x(), scale.y(), scale.z());
 		}
-		static Matrix4 MakeRotation(float angle, float x, float y, float z);
-		static Matrix4 MakeRotation(float angle, Vector3 direction) {
-			return MakeRotation(angle, direction.x(), direction.y(), direction.z());
+		static Matrix4 MakeRotation(float angle, float x, float y, float z) {
+			return MakeRotation(angle, Vector3(x, y, z));
 		}
+		static Matrix4 MakeRotation(float angle, Vector3 direction);
 		static Matrix4 MakeEuler(float angle_x, float angle_y, float angle_z);
 		static Matrix4 MakeLookAt(Vector3 eye, Vector3 at, Vector3 up);
 		static Matrix4 MakePerspectiveFov(float fovy, float aspect, float near, float far);

@@ -7,7 +7,7 @@
 namespace MyGL {
 	class Clipping {
 	public:
-		virtual vector<Primitives> ViewFrustumClipping(const vector<Primitives> primitives, GLState state);
+		virtual unique_ptr<Primitives> ViewFrustumClipping(unique_ptr<Primitives> primitives, GLState state);
 		virtual bool BackFaceCulling(const Vertex &v1, const Vertex &v2, const Vertex &v3, GLState state);
 	};
 }

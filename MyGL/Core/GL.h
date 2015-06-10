@@ -21,7 +21,6 @@ namespace MyGL {
 
 		void Clear(bool colorBuffer = true, bool depthBuffer = false, bool stencilBuffer = false);
 		void ClearColor(Color color);
-		void ClearColor();
 		void ClearDepth() { throw Exception::NotImplementationException(); }
 		void ClearStencil() { throw Exception::NotImplementationException(); }
 
@@ -108,6 +107,7 @@ namespace MyGL {
 				primitives.release();
 				throw Exception("[MyGL] the vertices just built has some problems.", Exception::kWarning);
 			}
+			primitives = _clipping.get()->ViewFrustumClipping(std::move(primitives), _state);
 			_drawCalls.push_back(make_unique<DrawCall>(primitives));
 			return *this;
 		}
@@ -125,12 +125,19 @@ namespace MyGL {
 			_state.vertexUV = uv;
 			return *this;
 		}
+		GL& SetNormal(float x, float y, float z) {
+			return SetNormal(Vector3(x, y, z));
+		}
+		GL& SetNormal(const Vector3 &normal) {
+			_state.vertexNormal = normal.Unit();
+			return *this;
+		}
 		GL& AddVertex(float x, float y, float z) {
 			return AddVertex(Vector3(x, y, z));
 		}
 		GL& AddVertex(const Vector3 &position) {
 			auto viewport_position = _state.ModelToViewport(position);
-			_primitvesBuilder->AddVertex(Vertex(viewport_position, _state.vertexColor, _state.vertexUV));
+			_primitvesBuilder->AddVertex(Vertex(viewport_position, _state.vertexColor, _state.vertexUV, _state.vertexNormal));
 			return *this;
 		}
 

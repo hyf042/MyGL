@@ -179,7 +179,7 @@ namespace MyGL {
 		template<int OTHER_SIZE>
 		static Vector2 Of(const Vector<OTHER_SIZE> &other) { return Vector2(other); }
 
-		Vector2 Unit() {
+		Vector2 Unit() const {
 			auto normalized = Clone();
 			normalized.Normalize();
 			return normalized;
@@ -227,7 +227,7 @@ namespace MyGL {
 		template<int OTHER_SIZE>
 		static Vector3 Of(const Vector<OTHER_SIZE> &other) { return Vector3(other); }
 
-		Vector3 Unit() {
+		Vector3 Unit() const {
 			auto normalized = Clone();
 			normalized.Normalize();
 			return normalized;
@@ -286,7 +286,7 @@ namespace MyGL {
 		operator Vector3();
 		Vector3 AsVector3();
 
-		Vector4 Unit() {
+		Vector4 Unit() const {
 			auto normalized = Clone();
 			normalized.Normalize();
 			return normalized;
