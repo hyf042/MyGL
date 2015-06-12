@@ -15,6 +15,9 @@ namespace MyGL {
 		if (GL::Instance().GetClipping().lock()->BackFaceCulling(v1, v2, v3, GL::Instance().getState())) {
 			return vector<Fragment>();
 		}
+		if (!GL::Instance().TestZCulling(v1, v2, v3)) {
+			return vector<Fragment>();
+		}
 		vector<Fragment> fragments;
 
 		const Vector3 &p1 = v1.position;

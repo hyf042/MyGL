@@ -18,6 +18,9 @@ namespace MyGL {
 		inline int size() const {
 			return _vertices.size();
 		}
+		inline vector<Vertex>& get_vertices() {
+			return _vertices;
+		}
 
 	protected:
 		vector<Vertex> _vertices;

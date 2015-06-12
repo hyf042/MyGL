@@ -28,6 +28,10 @@ namespace MyGL {
 			return Exception("[MyGL] this array is empty!");
 		}
 
+		static Exception NotExistedException() {
+			return Exception("[MyGL] not exist this item!");
+		}
+
 	private:
 		int _level;
 	};

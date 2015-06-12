@@ -2,7 +2,7 @@
 #define _MYGL_CONTEXT_RENDERINGCONTEXT_H_
 
 #include "../Core/PreDefines.h"
-#include "../Core/Structures/PixelBuffer.h"
+#include "../Core/Structures/Buffer.h"
 
 namespace MyGL {
 	class RenderingContext {
@@ -16,7 +16,7 @@ namespace MyGL {
 		
 		virtual void SwapBuffers();
 	protected:
-		virtual void FlushWindow(weak_ptr<const PixelBuffer> buffer) = 0;
+		virtual void FlushWindow(weak_ptr<const ColorBuffer> buffer) = 0;
 	};
 }
 

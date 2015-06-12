@@ -273,6 +273,9 @@ namespace MyGL {
 
 	public:
 		Vector4() : base_type() {}
+		Vector4(float val) {
+			SetValue(val, val, val, val);
+		}
 		Vector4(float x, float y, float z) {
 			SetValue(x, y, z, 1.0f);
 		}

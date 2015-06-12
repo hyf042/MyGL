@@ -29,8 +29,8 @@ namespace MyGL {
 			_sprite->setTexture(*_texture);
 		}
 
-		override void FlushWindow(weak_ptr<const PixelBuffer> buffer) {
-			_texture->update(buffer.lock()->GetPixelRaw());
+		override void FlushWindow(weak_ptr<const ColorBuffer> buffer) {
+			_texture->update(buffer.lock()->GetRawBytes());
 			_window->clear();
 			_window->draw(*_sprite);
 			_window->display();
@@ -38,6 +38,15 @@ namespace MyGL {
 
 		weak_ptr<sf::RenderWindow> GetWindow() const {
 			return _window;
+		}
+
+		shared_ptr<Texture> LoadTexture(const string &filename) const {
+			sf::Image image;
+			image.loadFromFile(filename);
+			image.flipVertically();
+			auto texture = GL::Instance().GenTexture();
+			texture->SetTexture(image.getSize().x, image.getSize().y, image.getPixelsPtr());
+			return texture;
 		}
 
 	private:

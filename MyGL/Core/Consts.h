@@ -32,6 +32,30 @@ namespace MyGL {
 		GL_CW,
 		GL_CCW
 	};
+
+	enum TextureTarget {
+		GL_TEXTURE_2D
+	};
+
+	enum GLFlag {
+		GL_FLAG_NONE = 0,
+		GL_DEPTH_TEST = 1,
+		GL_BLEND = 2,
+		GL_Z_CULLING = 4
+	};
+
+	enum BlendMode {
+		GL_ZERO,
+		GL_ONE,
+		GL_SRC_ALPHA,
+		GL_DST_ALPHA,
+		GL_ONE_MINUS_SRC_ALPHA,
+		GL_ONE_MINUS_DST_ALPHA,
+		GL_SRC_COLOR,
+		GL_DST_COLOR,
+		GL_ONE_MINUS_SRC_COLOR,
+		GL_ONE_MINUS_DST_COLOR
+	};
 }
 
 #endif

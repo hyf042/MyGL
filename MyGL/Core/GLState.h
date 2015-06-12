@@ -1,11 +1,17 @@
 #ifndef _MYGL_CORE_GLSTATE_H_
 #define _MYGL_CORE_GLSTATE_H_
 
+#include <map>
+#include <set>
 #include "Consts.h"
 #include "MatrixWrapper.h"
-#include "DrawCall.h"
+#include "Texture.h"
+#include "Structures/Color.h"
 
 namespace MyGL {
+	using std::map;
+	using std::set;
+
 	// Restores the state of MyGL, includes all settings, matrixs, etc.
 	class GLState {
 	public:
@@ -27,14 +33,24 @@ namespace MyGL {
 		CullFaceMask cullFace;
 		// indicate which is front face.
 		Clockwise frontFace;
+		// texture targets.
+		map<TextureTarget, shared_ptr<Texture>> textureTargets;
+		// flags.
+		set<GLFlag> flags;
+		// src blend mode.
+		BlendMode srcBlendMode = GL_SRC_ALPHA;
+		// dst blend mode.
+		BlendMode dstBlendMode = GL_ONE_MINUS_SRC_ALPHA;
 
 		GLState() : 
 			matrixMode(GL_MODEVIEW), 
 			vertexColor(Colors::White),
 			vertexUV(),
 			cullFace(GL_BACK),
-			frontFace(GL_CCW)
-		{}
+			frontFace(GL_CCW) {
+
+			flags.insert(GL_DEPTH_TEST);
+		}
 
 		void LoadIdentity() {
 			modelViewMatrix.LoadIdentity();
@@ -65,6 +81,9 @@ namespace MyGL {
 		}
 		Vector3 ModelToProjectionSpace(Vector3 point) {
 			return projectionMatrix.get_matrix() * modelViewMatrix.get_matrix() * point;
+		}
+		bool CheckFlag(GLFlag flag) {
+			return flags.find(flag) != flags.end();
 		}
 	};
 

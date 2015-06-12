@@ -5,6 +5,8 @@
 #include "Vertex.h"
 #include "MatrixWrapper.h"
 #include "PrimitivesBuilder.h"
+#include "DrawCall.h"
+#include "Shader.h"
 
 namespace MyGL {
 	class GL {
@@ -14,14 +16,11 @@ namespace MyGL {
 			return _instance;
 		}
 
-		void Init(int width, int height) {
-			_colorBuffer = make_shared<PixelBuffer>(width, height);
-			Viewport(0, 0, static_cast<float>(width), static_cast<float>(height));
-		}
+		void Init(int width, int height);
 
-		void Clear(bool colorBuffer = true, bool depthBuffer = false, bool stencilBuffer = false);
+		void Clear(bool colorBuffer = true, bool depthBuffer = true, bool stencilBuffer = false);
 		void ClearColor(Color color);
-		void ClearDepth() { throw Exception::NotImplementationException(); }
+		void ClearDepth(float val = 1.0f);
 		void ClearStencil() { throw Exception::NotImplementationException(); }
 
 		/*
@@ -125,6 +124,13 @@ namespace MyGL {
 			_state.vertexUV = uv;
 			return *this;
 		}
+		GL& SetTexCoord(float u, float v) {
+			return SetTexCoord(Vector2(u, v));
+		}
+		GL& SetTexCoord(const Vector2 &uv) {
+			_state.vertexUV = uv;
+			return *this;
+		}
 		GL& SetNormal(float x, float y, float z) {
 			return SetNormal(Vector3(x, y, z));
 		}
@@ -142,6 +148,30 @@ namespace MyGL {
 		}
 
 		/*
+		 * Textures
+		 **/
+		shared_ptr<Texture> GenTexture() {
+			return make_shared<Texture>();
+		}
+
+		vector<shared_ptr<Texture>> GenTextures(int num) {
+			vector<shared_ptr<Texture>> textures(num);
+			for (int i = 0; i < num; i++) {
+				textures[i] = make_shared<Texture>();
+			}
+			return textures;
+		}
+
+		GL& BindTexture(TextureTarget target, shared_ptr<Texture> texture) {
+			_state.textureTargets[target] = texture;
+			return *this;
+		}
+		GL& TexImage2D(TextureTarget target, int width, int height, const uint8 *data) {
+			_state.textureTargets[target]->SetTexture(width, height, data);
+			return *this;
+		}
+
+		/*
 		 * Flags & Settings
 		 **/
 		GL& CullFace(CullFaceMask cullFace) {
@@ -151,6 +181,22 @@ namespace MyGL {
 		GL& FrontFace(Clockwise frontFace) {
 			_state.frontFace = frontFace;
 			return *this;
+		}
+		GL& BlendFunc(BlendMode srcMode, BlendMode dstMode) {
+			_state.srcBlendMode = srcMode;
+			_state.dstBlendMode = dstMode;
+			return *this;
+		}
+		GL& Enable(GLFlag flag) {
+			_state.flags.insert(flag);
+			return *this;
+		}
+		GL& Disable(GLFlag flag) {
+			_state.flags.erase(flag);
+			return *this;
+		}
+		bool IsEnable(GLFlag flag) {
+			return _state.flags.find(flag) != _state.flags.end();
 		}
 
 		// Test
@@ -162,7 +208,7 @@ namespace MyGL {
 		const GLState& getState() const {
 			return _state;
 		}
-		weak_ptr<const PixelBuffer> GetBuffer();
+		weak_ptr<const ColorBuffer> GetBuffer();
 		weak_ptr<Clipping> GetClipping() {
 			return _clipping;
 		}
@@ -174,23 +220,43 @@ namespace MyGL {
 			return _colorBuffer->height();
 		}
 
+		/**
+		* Utility
+		*/
+		static Color GetTexture2D(weak_ptr<Texture> texture, const Vector2 &uv);
+		static Vector4 GetBlendFactor(BlendMode blendMode, Color src, Color dst);
+		bool TestZCulling(const Vertex &v1, const Vertex &v2, const Vertex &v3);
+
 	private:
 		GL() : _clipping(new Clipping()) {}
 		MatrixWrapper& _GetCurrentMatrixWrapper() {
 			return _state.GetCurrentMatrix();
 		}
 		void _DoDrawCall(const unique_ptr<DrawCall> &drawCall);
-		
+
+		/**
+		 * Vertex Pipeline
+		 */
+		void _DoVertexPipeline(const unique_ptr<Primitives> &primitives);
+
+		/**
+		 * Fragment Pipeline
+		 */
+		void _DoFragmentPipeline(int x, int y, const Fragment &fragment);
+		Color _GenerateVertexColor(const Fragment &fragment);
+		Color _DoAlphaBlend(Color src, Color dst, BlendMode srcBlendMode, BlendMode dstBlendMode);
+
 		GLState _state;
 
 		// all draw calls.
 		vector<unique_ptr<DrawCall>> _drawCalls;
 
+		unique_ptr<Shader> _shader;
 		unique_ptr<PrimitivesBuilder> _primitvesBuilder;
 		shared_ptr<Clipping> _clipping;
-		shared_ptr<PixelBuffer> _colorBuffer;
-		shared_ptr<PixelBuffer> _depthBuffer;
-		shared_ptr<PixelBuffer> _stencilBuffer;
+		shared_ptr<ColorBuffer> _colorBuffer;
+		shared_ptr<Buffer<float>> _depthBuffer;
+		shared_ptr<Buffer<uint8>> _stencilBuffer;
 	};
 }
 

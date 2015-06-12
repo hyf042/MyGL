@@ -3,6 +3,7 @@
 
 #include "../Math.h"
 #include "../PreDefines.h"
+#include "Structures/Vector.h"
 
 namespace MyGL {
 	class Color {
@@ -52,6 +53,19 @@ namespace MyGL {
 				Math::Lerp(from._g, to._g, ratio),
 				Math::Lerp(from._b, to._b, ratio),
 				Math::Lerp(from._a, to._a, ratio));
+		}
+
+		friend Color operator*(const Color &color, float scale) {
+			return Color(color._r * scale, color._g * scale, color._b * scale, color._a * scale);
+		}
+		friend Color operator*(const Color &color, const Vector4 &scale) {
+			return Color(color._r * scale.x(), color._g * scale.y(), color._b * scale.z(), color._a * scale.w());
+		}
+		friend Color operator*(const Color &lhs, const Color &rhs) {
+			return Color(lhs._r * rhs._r, lhs._g * rhs._g, lhs._b * rhs._b, lhs._a * rhs._a);
+		}
+		friend Color operator+(const Color &lhs, const Color &rhs) {
+			return Color(lhs._r + rhs._r, lhs._g + rhs._g, lhs._b + rhs._b, lhs._a + rhs._a);
 		}
 
 	private:

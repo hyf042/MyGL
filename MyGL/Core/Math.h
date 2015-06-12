@@ -67,7 +67,9 @@ namespace MyGL {
 		static inline float Floor(float val) {
 			return floorf(val);
 		}
-
+		static inline float Round(float val) {
+			return roundf(val);
+		}
 		static inline float Abs(float val) {
 			return abs(val);
 		}

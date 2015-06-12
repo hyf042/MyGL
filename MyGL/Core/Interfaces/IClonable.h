@@ -2,6 +2,7 @@
 #define _MYGL_CORE_INTERFACES_ICLONABLE_H_
 
 #include "../PreDefines.h"
+#include "../Interfaces/IClonable.h"
 
 namespace MyGL {
 	template<typename T>
@@ -9,7 +10,6 @@ namespace MyGL {
 	public:
 		virtual T Clone() const = 0;
 		virtual shared_ptr<T> ClonePtr() const = 0;
-
 		virtual ~IClonable() {}
 	};
 }
