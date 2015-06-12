@@ -56,6 +56,13 @@ namespace MyGL {
 		GL_ONE_MINUS_SRC_COLOR,
 		GL_ONE_MINUS_DST_COLOR
 	};
+
+	enum WrapMode {
+		GL_REPEAT,
+		GL_MIRRORED_REPEAT,
+		GL_CLAMP_TO_EDGE,
+		GL_CLAMP_TO_BORDER
+	};
 }
 
 #endif

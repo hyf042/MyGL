@@ -2,7 +2,7 @@
 
 namespace MyGL {
 	unique_ptr<Primitives> Clipping::ViewFrustumClipping(unique_ptr<Primitives> primitives, GLState state) {
-		// Do nothing, not implemented yet.
+		//TODO(yifengh): not implemented yet.
 		return primitives;
 	}
 	bool Clipping::BackFaceCulling(const Vertex &v1, const Vertex &v2, const Vertex &v3, GLState state) {

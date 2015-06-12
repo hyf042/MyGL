@@ -70,6 +70,14 @@ namespace MyGL {
 		static inline float Round(float val) {
 			return roundf(val);
 		}
+		static inline float Mod(float val, float div) {
+			if (val > 0) {
+				return val - floor(val / div) * div;
+			}
+			else {
+				return val + ceil(val / div) * div;
+			}
+		}
 		static inline float Abs(float val) {
 			return abs(val);
 		}

@@ -108,11 +108,10 @@ namespace MyGL {
 	 * Utilities
 	 */
 	Color GL::GetTexture2D(weak_ptr<Texture> texture, const Vector2 &uv) {
-		int tx = static_cast<int>(Math::Round(uv.x() * texture.lock()->width() - 0.5f));
-		int ty = static_cast<int>(Math::Round(uv.y() * texture.lock()->height() - 0.5f));
-		tx = Math::Clamp(tx, 0, texture.lock()->width() - 1);
-		ty = Math::Clamp(ty, 0, texture.lock()->height() - 1);
-		return texture.lock()->GetColor(tx, ty);
+		if (!texture.lock()) {
+			return Colors::White;
+		}
+		return texture.lock()->GetColor(uv);
 	}
 
 	Vector4 GL::GetBlendFactor(BlendMode blendMode, Color src, Color dst) {

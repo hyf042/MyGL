@@ -170,6 +170,10 @@ namespace MyGL {
 			_state.textureTargets[target]->SetTexture(width, height, data);
 			return *this;
 		}
+		GL& TexWrapMode(TextureTarget target, WrapMode horizMode, WrapMode vertMode) {
+			_state.textureTargets[target]->SetWrapMode(horizMode, vertMode);
+			return *this;
+		}
 
 		/*
 		 * Flags & Settings
