@@ -8,9 +8,7 @@
 namespace MyGL {
 	class Light {
 	public:
-		Light() {
-			int tmp = 1;
-		}
+		Light() {}
 		virtual ~Light() {}
 
 		virtual Color Calculate(const Vector3 &world_position, const Vector3& normal, const Material &material);

@@ -82,8 +82,8 @@ namespace MyGL {
 		Vector3 ModelToWorldSpace(Vector3 point) {
 			return modelViewMatrix.get_matrix() * point;
 		}
-		Vector3 VectorToWorldSpace(Vector3 vec) {
-			return modelViewMatrix.get_matrix() * Vector4::Of(vec, true);
+		Vector3 NormalToWorldSpace(Vector3 vec) {
+			return modelViewMatrix.get_inverse().Transpose() * Vector4::Of(vec, true);
 		}
 		Vector3 ModelToProjectionSpace(Vector3 point) {
 			return projectionMatrix.get_matrix() * modelViewMatrix.get_matrix() * point;

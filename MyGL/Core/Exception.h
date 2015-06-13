@@ -9,7 +9,9 @@ namespace MyGL {
 			kError = 10,
 			kSevere = 100
 		};
-		Exception(int level = kError) : exception(), _level(level) {}
+		Exception(int level = kError) : exception(), _level(level) {
+
+		}
 		explicit Exception(string error, int level = kError) : exception(error.c_str()), _level(level) {}
 
 		int get_level() const {

@@ -228,6 +228,46 @@ namespace MyGL {
 					{ v30, v31, v32 } };
 			return Matrix4x3(values);
 		}
+
+		template<int SIZE>
+			Matrix<SIZE, SIZE> Inverse(const Matrix<SIZE, SIZE> &matrix) {
+			auto inverse = Matrix<SIZE, SIZE>::Identity();
+			auto clone = matrix.Clone();
+
+			for (int i = 0; i < SIZE; i++) {
+				for (int j = i; j < SIZE; j++) {
+					if (!Math::IsZero(clone[i][j])) {
+						// inverse i and j row
+						for (int k = 0; k < SIZE; k++) {
+							std::swap(clone[i][k], clone[j][k]);
+							std::swap(inverse[i][k], inverse[j][k]);
+						}
+						break;
+					}
+				}
+				if (Math::IsZero(clone[i][i])) {
+					throw Exception("[MyGL] this matrix has no inverse!");
+				}
+				float val = clone[i][i];
+				// divide by the factor
+				for (int j = 0; j < SIZE; j++) {
+					clone[i][j] /= val;
+					inverse[i][j] /= val;
+				}
+				// minus out in the following rows
+				for (int j = i + 1; j < SIZE; j++) {
+					val = clone[j][i];
+					if (!Math::IsZero(val)) {
+						for (int k = 0; k < SIZE; k++) {
+							clone[j][k] -= val * clone[i][k];
+							inverse[j][k] -= val * clone[j][k];
+						}
+					}
+				}
+			}
+
+			return inverse;
+		}
 	}
 }
 

@@ -144,7 +144,7 @@ namespace MyGL {
 		GL& AddVertex(const Vector3 &position) {
 			Vector3 world_position;
 			auto viewport_position = _state.ModelToViewport(position, world_position);
-			Vector3 normal = _state.VectorToWorldSpace(_state.vertexNormal);
+			Vector3 normal = _state.NormalToWorldSpace(_state.vertexNormal);
 			_DealCreateVertex(viewport_position, world_position, _state.vertexColor, _state.vertexUV, normal);
 			return *this;
 		}

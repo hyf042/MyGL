@@ -12,11 +12,13 @@ namespace MyGL {
 	public:
 		MatrixWrapper() {
 			_matrix = Matrix4::Identity();
+			_dirty = true;
 		}
 
 		MatrixWrapper& LoadIdentity() {
 			_matrix = Matrix4::Identity();
 			_matrixStack = stack<Matrix4>();
+			_dirty = true;
 			return *this;
 		}
 
@@ -25,6 +27,7 @@ namespace MyGL {
 		}
 		MatrixWrapper& Translate(const Vector3 &offset) {
 			_matrix = _matrix * Transforms::MakeTranslate(offset.x(), offset.y(), offset.z());
+			_dirty = true;
 			return *this;
 		}
 		MatrixWrapper& Scale(float x, float y, float z) {
@@ -35,6 +38,7 @@ namespace MyGL {
 		}
 		MatrixWrapper& Scale(const Vector3 &scale) {
 			_matrix = _matrix * Transforms::MakeScale(scale.x(), scale.y(), scale.z());
+			_dirty = true;
 			return *this;
 		}
 
@@ -43,6 +47,7 @@ namespace MyGL {
 		}
 		MatrixWrapper& Rotate(float angle, Vector3 direction) {
 			_matrix = _matrix * Transforms::MakeRotation(angle, direction.x(), direction.y(), direction.z());
+			_dirty = true;
 			return *this;
 		}
 
@@ -56,28 +61,41 @@ namespace MyGL {
 			}
 			_matrix = _matrixStack.top();
 			_matrixStack.top();
+			_dirty = true;
 			return *this;
 		}
 
 		MatrixWrapper& Multiply(const Matrix4 &left) {
 			_matrix = _matrix * left;
+			_dirty = true;
 			return *this;
 		}
 
 		MatrixWrapper& operator=(const Matrix4& other) {
 			_matrix = other;
+			_dirty = true;
 			return *this;
 		}
 
 		void set_matrix(const Matrix4 &matrix) {
 			_matrix = matrix;
+			_dirty = true;
 		}
 		const Matrix4& get_matrix() const {
 			return _matrix;
 		}
+		Matrix4 get_inverse() {
+			if (_dirty) {
+				_inverse = Matrixs::Inverse(_matrix);
+				_dirty = false;
+			}
+			return _inverse;
+		}
 	private:
+		bool _dirty;
 		stack<Matrix4> _matrixStack;
 		Matrix4 _matrix;
+		Matrix4 _inverse;
 	};
 }
 
