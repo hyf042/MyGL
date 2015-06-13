@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <utility>
+#include "PreDefines.h"
 
 namespace MyGL {
 	class Math {
@@ -98,6 +99,21 @@ namespace MyGL {
 		}
 		static inline float Power(float exponent) {
 			return expf(exponent);
+		}
+		static inline float Log(float val) {
+			return log(val);
+		}
+		static inline float Log(float val, float base) {
+			return log(val) / log(base);
+		}
+		static inline float Log2(float val) {
+			return log2(val);
+		}
+		static inline float Log10(float val) {
+			return log10(val);
+		}
+		static inline bool IsPowerOf2(int val) {
+			return val >= 0 && val == LOWBIT(val);
 		}
 		static inline float Degree2Radian(float degree) {
 			return degree * Pi / 180.0f;

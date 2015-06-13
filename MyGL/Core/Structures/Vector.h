@@ -409,8 +409,12 @@ namespace MyGL {
 		return ret;
 	}
 	template<int SIZE>
+	typename VectorTypeTraits<SIZE>::vector_type operator/(const Vector<SIZE> &lhs, float rhs) {
+		return lhs * (1 / rhs);
+	}
+	template<int SIZE>
 	typename VectorTypeTraits<SIZE>::vector_type operator*(float lhs, const Vector<SIZE> &rhs) {
-		typename VectorTypeTraits<SIZE>::vector_type ret = rhs;
+		typename VectorTypeTraits<SIZE>::vector_type ret(rhs);
 		ret *= lhs;
 		return ret;
 	}

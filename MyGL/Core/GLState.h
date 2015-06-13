@@ -16,23 +16,23 @@ namespace MyGL {
 	class GLState {
 	public:
 		// matrix transfroms point from model space to camera space.
-		MatrixWrapper modelViewMatrix;
+		MatrixWrapper modelViewMatrix ;
 		// matrix transforms point from camera space to projection space.
 		MatrixWrapper projectionMatrix;
 		// matrix transforms point from clip space to viewport space.
 		Matrix4 viewportMatrix;
 		// current matrix mode.
-		MatrixMode matrixMode;
+		MatrixMode matrixMode = GL_MODEVIEW;
 		// current vertex color.
-		Color vertexColor;
+		Color vertexColor = Colors::White;
 		// current vertex uv.
-		Vector2 vertexUV;
+		Vector2 vertexUV = Vector2();
 		// current vertex normal.
-		Vector3 vertexNormal;
+		Vector3 vertexNormal = Vector3();
 		// mask of cull face.
-		CullFaceMask cullFace;
+		CullFaceMask cullFace = GL_BACK;
 		// indicate which is front face.
-		Clockwise frontFace;
+		Clockwise frontFace = GL_CCW;
 		// texture targets.
 		map<TextureTarget, shared_ptr<Texture>> textureTargets;
 		// flags.
@@ -41,14 +41,10 @@ namespace MyGL {
 		BlendMode srcBlendMode = GL_SRC_ALPHA;
 		// dst blend mode.
 		BlendMode dstBlendMode = GL_ONE_MINUS_SRC_ALPHA;
+		// depth test func.
+		DepthFunc depthFunc = GL_LESS;
 
-		GLState() : 
-			matrixMode(GL_MODEVIEW), 
-			vertexColor(Colors::White),
-			vertexUV(),
-			cullFace(GL_BACK),
-			frontFace(GL_CCW) {
-
+		GLState() {
 			flags.insert(GL_DEPTH_TEST);
 		}
 
@@ -72,15 +68,18 @@ namespace MyGL {
 			}
 		}
 
-		Vector3 ModelToViewport(Vector3 point) {
-			Vector4 vec = modelViewMatrix.get_matrix() * point;
-			return viewportMatrix * projectionMatrix.get_matrix() * vec;
-		}
 		Vector3 ModelToCameraSpace(Vector3 point) {
 			return modelViewMatrix.get_matrix() * point;
 		}
 		Vector3 ModelToProjectionSpace(Vector3 point) {
 			return projectionMatrix.get_matrix() * modelViewMatrix.get_matrix() * point;
+		}
+		Vector3 ModelToViewport(Vector3 point) {
+			return viewportMatrix * projectionMatrix.get_matrix() * modelViewMatrix.get_matrix() * point;
+		}
+		Vector3 ModelToViewport(Vector3 point, Vector3 &world_position) {
+			world_position = modelViewMatrix.get_matrix() * point;
+			return viewportMatrix * projectionMatrix.get_matrix() * world_position;
 		}
 		bool CheckFlag(GLFlag flag) {
 			return flags.find(flag) != flags.end();

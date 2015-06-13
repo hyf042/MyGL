@@ -40,6 +40,7 @@ namespace MyGL {
 	class RenderingContext;
 
 	#define override virtual
+	#define LOWBIT(x) ((x)&(-x))
 }
 
 #endif

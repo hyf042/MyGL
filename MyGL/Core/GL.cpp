@@ -47,10 +47,8 @@ namespace MyGL {
 			_DoVertexPipeline(primitive);
 			auto fragments = primitive->Rasterize();
 			for (auto &fragment : fragments) {
-				int x = static_cast<int>(fragment.x());
-				int y = static_cast<int>(fragment.y());
-				if (Math::InRange(x, 0, width() - 1) && Math::InRange(y, 0, height() - 1)) {
-					_DoFragmentPipeline(x, y, fragment);
+				if (Math::InRange(fragment.get_output_x(), 0, width() - 1) && Math::InRange(fragment.get_output_y(), 0, height() - 1)) {
+					_DoFragmentPipeline(fragment);
 				}
 			}
 		}
@@ -65,13 +63,12 @@ namespace MyGL {
 		}
 	}
 
-	void GL::_DoFragmentPipeline(int x, int y, const Fragment &fragment) {
+	void GL::_DoFragmentPipeline(const Fragment &fragment) {
 		// Depth test
 		if (IsEnable(GL_DEPTH_TEST)) {
-			if (_depthBuffer->Get(x, y) < fragment.z()) {
+			if (!DepthTest(fragment)) {
 				return;
 			}
-			_depthBuffer->SetData(x, y, fragment.z());
 		}
 
 		// Generate color
@@ -79,11 +76,11 @@ namespace MyGL {
 
 		// Alpha blend
 		if (IsEnable(GL_BLEND)) {
-			color = _DoAlphaBlend(color, _colorBuffer->Get(x, y), _state.srcBlendMode, _state.dstBlendMode);
+			color = _DoAlphaBlend(color, _colorBuffer->Get(fragment.get_output_x(), fragment.get_output_y()), _state.srcBlendMode, _state.dstBlendMode);
 		}
 
 		// Set final color
-		_colorBuffer->SetData(x, y, color);
+		_colorBuffer->SetData(fragment.get_output_x(), fragment.get_output_y(), color);
 	}
 
 	Color GL::_DoAlphaBlend(Color src, Color dst, BlendMode srcBlendMode, BlendMode dstBlendMode) {
@@ -107,11 +104,11 @@ namespace MyGL {
 	/**
 	 * Utilities
 	 */
-	Color GL::GetTexture2D(weak_ptr<Texture> texture, const Vector2 &uv) {
+	Color GL::GetTexture2D(weak_ptr<Texture> texture, const Fragment &fragment) {
 		if (!texture.lock()) {
 			return Colors::White;
 		}
-		return texture.lock()->GetColor(uv);
+		return texture.lock()->GetColor(fragment);
 	}
 
 	Vector4 GL::GetBlendFactor(BlendMode blendMode, Color src, Color dst) {
@@ -147,6 +144,42 @@ namespace MyGL {
 			return true;
 		}
 		//TODO(yifengh): not implement yet.
+		return true;
+	}
+
+	bool GL::DepthTest(const Fragment &fragment) {
+		float src_z = fragment.z();
+		float dst_z = _depthBuffer->Get(fragment.get_output_x(), fragment.get_output_y());
+		bool flag = false;
+		switch (_state.depthFunc) {
+		case GL_NEVER:
+			break;
+		case GL_LESS:
+			flag = Math::Less(src_z, dst_z);
+			break;
+		case GL_EQUAL:
+			flag = Math::Equal(src_z, dst_z);
+			break;
+		case GL_LEQUAL:
+			flag = Math::LessOrEqual(src_z, dst_z);
+			break;
+		case GL_GEQUAL:
+			flag = Math::GreaterOrEqual(src_z, dst_z);
+			break;
+		case GL_GREATER:
+			flag = Math::Greater(src_z, dst_z);
+			break;
+		case GL_NOTEQUAL:
+			flag = !Math::Equal(src_z, dst_z);
+			break;
+		case GL_ALWAYS:
+			flag = true;
+			break;
+		}
+		if (!flag) {
+			return false;
+		}
+		_depthBuffer->SetData(fragment.get_output_x(), fragment.get_output_y(), fragment.z());
 		return true;
 	}
 }

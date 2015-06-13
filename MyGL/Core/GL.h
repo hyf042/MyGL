@@ -142,8 +142,9 @@ namespace MyGL {
 			return AddVertex(Vector3(x, y, z));
 		}
 		GL& AddVertex(const Vector3 &position) {
-			auto viewport_position = _state.ModelToViewport(position);
-			_primitvesBuilder->AddVertex(Vertex(viewport_position, _state.vertexColor, _state.vertexUV, _state.vertexNormal));
+			Vector3 world_position = position;
+			auto viewport_position = _state.ModelToViewport(position, world_position);
+			_primitvesBuilder->AddVertex(Vertex(viewport_position, _state.vertexColor, _state.vertexUV, _state.vertexNormal, world_position.z()));
 			return *this;
 		}
 
@@ -170,8 +171,41 @@ namespace MyGL {
 			_state.textureTargets[target]->SetTexture(width, height, data);
 			return *this;
 		}
-		GL& TexWrapMode(TextureTarget target, WrapMode horizMode, WrapMode vertMode) {
+		GL& TexWrapMode(TextureTarget target, TextureWrapMode horizMode, TextureWrapMode vertMode) {
 			_state.textureTargets[target]->SetWrapMode(horizMode, vertMode);
+			return *this;
+		}
+		GL& TexFilterMode(TextureTarget target, TextureFilterMode magfiliter, TextureFilterMode minfilter, TextureFilterMode levelfilter) {
+			_state.textureTargets[target]->SetMinFilter(minfilter);
+			_state.textureTargets[target]->SetMaxFilter(magfiliter);
+			_state.textureTargets[target]->SetLevelFilter(levelfilter);
+			return *this;
+		}
+		GL& TexParameter(TextureTarget target, TextureParameter parameter, int val) {
+			auto& texture = _state.textureTargets[target];
+			switch (parameter) {
+			case GL_TEXTURE_WRAP_S:
+				texture->SetHorizontalWrapMode(static_cast<TextureWrapMode>(val));
+				break;
+			case GL_TEXTURE_WRAP_T:
+				texture->SetVerticalWrapMode(static_cast<TextureWrapMode>(val));
+				break;
+			case GL_TEXTURE_MIN_FILTER:
+				texture->SetMinFilter(static_cast<TextureFilterMode>(val));
+				break;
+			case GL_TEXTURE_MAX_FILTER:
+				texture->SetMaxFilter(static_cast<TextureFilterMode>(val));
+				break;
+			case GL_TEXTURE_LEVEL:
+				texture->LoadMipmap(val);
+				break;
+			case GL_TEXTURE_MIN_LOD:
+				texture->SetMinMipmapLOD(val);
+				break;
+			case GL_TEXTURE_MAX_LOD:
+				texture->SetMaxMinmapLOD(val);
+				break;
+			}
 			return *this;
 		}
 
@@ -189,6 +223,10 @@ namespace MyGL {
 		GL& BlendFunc(BlendMode srcMode, BlendMode dstMode) {
 			_state.srcBlendMode = srcMode;
 			_state.dstBlendMode = dstMode;
+			return *this;
+		}
+		GL& DepthFunc(DepthFunc depthFunc) {
+			_state.depthFunc = depthFunc;
 			return *this;
 		}
 		GL& Enable(GLFlag flag) {
@@ -227,9 +265,10 @@ namespace MyGL {
 		/**
 		* Utility
 		*/
-		static Color GetTexture2D(weak_ptr<Texture> texture, const Vector2 &uv);
+		static Color GetTexture2D(weak_ptr<Texture> texture, const Fragment &fragment);
 		static Vector4 GetBlendFactor(BlendMode blendMode, Color src, Color dst);
 		bool TestZCulling(const Vertex &v1, const Vertex &v2, const Vertex &v3);
+		bool DepthTest(const Fragment &fragment);
 
 	private:
 		GL() : _clipping(new Clipping()) {}
@@ -246,7 +285,7 @@ namespace MyGL {
 		/**
 		 * Fragment Pipeline
 		 */
-		void _DoFragmentPipeline(int x, int y, const Fragment &fragment);
+		void _DoFragmentPipeline(const Fragment &fragment);
 		Color _GenerateVertexColor(const Fragment &fragment);
 		Color _DoAlphaBlend(Color src, Color dst, BlendMode srcBlendMode, BlendMode dstBlendMode);
 

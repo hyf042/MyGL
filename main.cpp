@@ -187,16 +187,16 @@ public:
 
 		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
 
-		gl, MatrixMode(GL_PROJECTION);
+		gl.MatrixMode(GL_PROJECTION);
 		gl.LoadIdentity();
 		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
 
 		gl.LoadIdentity();									// Reset The View
 		gl.Translate(0.0f, 0.0f, -5.0f);
 
-		gl.Rotate(_xrot, 1.0f, 0.0f, 0.0f);
-		gl.Rotate(_yrot, 0.0f, 1.0f, 0.0f);
-		gl.Rotate(_zrot, 0.0f, 0.0f, 1.0f);
+		gl.Rotate(30.0f, 1.0f, 0.0f, 0.0f);
+		gl.Rotate(20.0f, 0.0f, 1.0f, 0.0f);
+		gl.Rotate(40.0f, 0.0f, 0.0f, 1.0f);
 
 		gl.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 		DrawCube();
@@ -215,28 +215,102 @@ public:
 		gl.Begin(GL_QUADS);
 		// Front Face
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
-		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
-		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
-		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
 		// Back Face
-		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
-		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
-		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
 		// Top Face
-		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
-		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
-		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
 		// Bottom Face
-		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
-		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
-		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
 		// Right face
-		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
-		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
-		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		// Left Face
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.End();
+	}
+
+private:
+	shared_ptr<Texture> _texture;
+	float _xrot;
+	float _yrot;
+	float _zrot;
+};
+
+class TextureFilter : public TestCase {
+public:
+	override void Init(SFMLContext &context) {
+		auto &gl = GL::Instance();
+		_texture = context.LoadTexture("NeHe.bmp");
+	}
+
+	override void OnDrawScene(float time) {
+		auto &gl = GL::Instance();
+
+		gl.Clear();
+
+		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
+
+		gl.MatrixMode(GL_PROJECTION);
+		gl.LoadIdentity();
+		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+
+		gl.LoadIdentity();									// Reset The View
+		gl.Translate(0.0f, 0.0f, -20.0f);
+		gl.Scale(1.0f, 1.0f, 1.0f);
+
+		gl.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+		DrawCube();
+	}
+
+	void DrawCube() {
+		auto &gl = GL::Instance();
+
+		gl.BindTexture(GL_TEXTURE_2D, _texture);
+		gl.TexWrapMode(GL_TEXTURE_2D, GL_REPEAT, GL_REPEAT);
+		gl.TexFilterMode(GL_TEXTURE_2D, GL_LINEAR, GL_LINEAR, GL_LINEAR);
+
+		gl.Begin(GL_QUADS);
+		// Front Face
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		// Back Face
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		// Top Face
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		// Bottom Face
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		// Right face
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
 		// Left Face
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
@@ -358,7 +432,7 @@ int main() {
 		sf::Clock timer;
 		float last_time = 0;
 
-		unique_ptr<TestCase> testCase = make_unique<TextureWrap>();
+		unique_ptr<TestCase> testCase = make_unique<NeheBox>();
 		testCase->Init(context);
 
 		while (window.lock()->isOpen())

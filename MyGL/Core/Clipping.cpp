@@ -6,7 +6,7 @@ namespace MyGL {
 		return primitives;
 	}
 	bool Clipping::BackFaceCulling(const Vertex &v1, const Vertex &v2, const Vertex &v3, GLState state) {
-		float determinant = (v2.position.x() - v1.position.x()) * (v3.position.y() - v1.position.y()) - (v2.position.y() - v1.position.y()) * (v3.position.x() - v1.position.x());
+		float determinant = (v2.x() - v1.x()) * (v3.y() - v1.y()) - (v2.y() - v1.y()) * (v3.x() - v1.x());
 		CullFaceMask face = GL_FACE_NONE;
 		if (determinant > 0) {
 			face = state.frontFace == GL_CCW ? GL_BACK : GL_FRONT;

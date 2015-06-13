@@ -7,36 +7,87 @@
 namespace MyGL {
 	class Vertex {
 	public:
-		Vector3 position;
-		Vector2 uv;
-		Vector3 normal;
-		Color color;
-
-		Vertex() : color(Colors::White) {}
-		Vertex(const Vector3 &position) : position(position), color(Colors::White) {}
-		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv) : position(position), uv(uv), color(color) {}
-		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv, const Vector3 &normal) : position(position), uv(uv), color(color), normal(normal) {}
+		Vertex() : _color(Colors::White) {}
+		Vertex(const Vector3 &position) : _position(position), _color(Colors::White) {}
+		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv) : _position(position), _uv(uv), _color(color) {}
+		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv, const Vector3 &normal) : _position(position), _uv(uv), _color(color), _normal(normal) {}
+		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv, const Vector3 &normal, float world_z) : _position(position), _uv(uv), _color(color), _normal(normal), _world_z(world_z) {}
 
 		inline float x() const {
-			return position.x();
+			return _position.x();
 		}
 		inline float y() const {
-			return position.y();
+			return _position.y();
 		}
 		inline float z() const {
-			return position.z();
+			return _position.z();
+		}
+		inline float world_z() const {
+			return _world_z;
+		}
+		inline const Vector3& position() const {
+			return _position;
+		}
+		inline void set_position(const Vector3 &position) {
+			_position = position;
+		}
+		inline const Vector2& uv() const {
+			return _uv;
+		}
+		inline const Vector3& normal() const {
+			return _normal;
+		}
+		inline const Color& color() const {
+			return _color;
 		}
 
 		static Vertex Lerp(const Vertex &from, const Vertex &to, float ratio) {
 			return Vertex(
-				Vector3::Lerp(from.position, to.position, ratio),
-				Color::Lerp(from.color, to.color, ratio),
-				Vector2::Lerp(from.uv, to.uv, ratio),
-				Vector3::Lerp(from.normal, to.normal, ratio));
+				Vector3::Lerp(from._position, to._position, ratio),
+				Color::Lerp(from._color, to._color, ratio),
+				LerpUVWithPerspectiveCorrectness(from, to, ratio),
+				Vector3::Lerp(from._normal, to._normal, ratio),
+				Math::Lerp(from.world_z(), to.world_z(), ratio));
 		}
+
+		// Lerps the uv of vertex with perspective correctness, see https://en.wikipedia.org/wiki/Texture_mapping#Perspective_correctness for details.
+		static Vector2 LerpUVWithPerspectiveCorrectness(const Vertex &from, const Vertex &to, float ratio) {
+			return Vector2::Lerp(from._uv / from.world_z(), to._uv / to.world_z(), ratio) / Math::Lerp(1.0f / from.world_z(), 1.0f / to.world_z(), ratio);
+		}
+
+	private:
+		Vector3 _position;
+		Vector2 _uv;
+		Vector3 _normal;
+		Color _color;
+		// used to do perspective correction
+		float _world_z = 0;
 	};
 
-	typedef Vertex Fragment;
+	class Fragment : public Vertex {
+	public:
+		// the footprint is the size of area where a pixel projection onto the texture space.
+		Fragment(const Vertex& vertex, float footprint) : Vertex(vertex) {
+			_output_x = static_cast<int>(x());
+			_output_y = static_cast<int>(y());
+			_footprint = footprint;
+		}
+
+		inline int get_output_x() const {
+			return _output_x;
+		}
+		inline int get_output_y() const {
+			return _output_y;
+		}
+		inline float get_footprint() const {
+			return _footprint;
+		}
+	private:
+		int _output_x;
+		int _output_y;
+		//TODO(yifengh): implement rectangle footprint (real footprint from pixel in screen space onto texture space), and further anisotropic filtering.
+		float _footprint;
+	};
 }
 
 #endif

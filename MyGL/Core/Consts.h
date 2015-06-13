@@ -37,6 +37,29 @@ namespace MyGL {
 		GL_TEXTURE_2D
 	};
 
+	enum TextureParameter {
+		GL_TEXTURE_MIN_FILTER,
+		GL_TEXTURE_MAX_FILTER,
+		GL_TEXTURE_LEVEL_FILTER,
+		GL_TEXTURE_WRAP_S,
+		GL_TEXTURE_WRAP_T,
+		GL_TEXTURE_LEVEL,
+		GL_TEXTURE_MIN_LOD,
+		GL_TEXTURE_MAX_LOD
+	};
+
+	enum TextureWrapMode {
+		GL_REPEAT,
+		GL_MIRRORED_REPEAT,
+		GL_CLAMP_TO_EDGE,
+		GL_CLAMP_TO_BORDER
+	};
+
+	enum TextureFilterMode {
+		GL_NEAREST,
+		GL_LINEAR
+	};
+
 	enum GLFlag {
 		GL_FLAG_NONE = 0,
 		GL_DEPTH_TEST = 1,
@@ -57,11 +80,15 @@ namespace MyGL {
 		GL_ONE_MINUS_DST_COLOR
 	};
 
-	enum WrapMode {
-		GL_REPEAT,
-		GL_MIRRORED_REPEAT,
-		GL_CLAMP_TO_EDGE,
-		GL_CLAMP_TO_BORDER
+	enum DepthFunc {
+		GL_NEVER,
+		GL_LESS,
+		GL_EQUAL,
+		GL_LEQUAL,
+		GL_GREATER,
+		GL_NOTEQUAL,
+		GL_GEQUAL,
+		GL_ALWAYS
 	};
 }
 

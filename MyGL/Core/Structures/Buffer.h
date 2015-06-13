@@ -3,6 +3,7 @@
 
 #include "../PreDefines.h"
 #include "../Interfaces/IClonable.h"
+#include "../Math.h"
 
 namespace MyGL {
 	template<typename T>
@@ -48,6 +49,11 @@ namespace MyGL {
 
 		int GetIndex(int x, int y) const {
 			return y * width() + x;
+		}
+		
+		void Clamp(int &x, int &y) const {
+			x = Math::Clamp(x, 0, width() - 1);
+			y = Math::Clamp(y, 0, height() - 1);
 		}
 
 		const uint8* GetRawBytes() const {
