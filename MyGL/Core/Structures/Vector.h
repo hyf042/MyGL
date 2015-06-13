@@ -195,6 +195,9 @@ namespace MyGL {
 			_values[1] = y;
 		}
 
+		Vector2 operator-() {
+			return Vector2(-x(), -y());
+		}
 		friend float Cross(const Vector2 &lhs, const Vector2 &rhs) {
 			return lhs.x() * rhs.y() - lhs.y() * rhs.x();
 		}
@@ -244,6 +247,9 @@ namespace MyGL {
 			_values[2] = z;
 		}
 
+		Vector3 operator-() {
+			return Vector3(-x(), -y(), -z());
+		}
 		friend Vector3 Cross(const Vector3 &lhs, const Vector3 &rhs) {
 			return Vector3(lhs.y() * rhs.z() - lhs.z() * rhs.y(), lhs.z() * rhs.x() - lhs.x() * rhs.z(), lhs.x() * rhs.y() - lhs.y() * rhs.x());
 		}
@@ -285,9 +291,9 @@ namespace MyGL {
 		template<int OTHER_SIZE>
 		explicit Vector4(const Vector<OTHER_SIZE> &other) : base_type(other) {}
 		override ~Vector4() {}
-		static Vector4 Of(const Vector3 &v3);
+		static Vector4 Of(const Vector3 &v3, bool isVector = false);
 		operator Vector3();
-		Vector3 AsVector3();
+		Vector3 AsVector3() const;
 
 		Vector4 Unit() const {
 			auto normalized = Clone();
@@ -311,6 +317,9 @@ namespace MyGL {
 		}
 		void SetSize(float w, float h) {
 			SetValue(x(), y(), x() + w, y() + h);
+		}
+		Vector4 operator-() {
+			return Vector4(-x(), -y(), -z(), -w());
 		}
 
 		inline float x() const {

@@ -108,7 +108,7 @@ public:
 
 		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
 
-		gl,MatrixMode(GL_PROJECTION);
+		gl.MatrixMode(GL_PROJECTION);
 		gl.LoadIdentity();
 		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
 
@@ -419,9 +419,99 @@ private:
 	float _zrot;
 };
 
-int main() {
-	const float fps = 60.0f;
+class LightTest : public TestCase {
+public:
+	override void Init(SFMLContext &context) {
+		auto &gl = GL::Instance();
+		gl.Enable(GL_LIGHTING);
 
+		gl.Enable(GL_LIGHT1);
+		gl.SetLightParameter(GL_LIGHT1, GL_AMBIENT, Color(0.0f, 0.0f, 0.0f, 1.0f));
+		gl.SetLightParameter(GL_LIGHT1, GL_DIFFUSE, Color(1.0f, 1.0f, 1.0f, 1.0f));
+		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(-1.0f, -1.0f, -1.0f, 1.0f));
+
+		_texture = context.LoadTexture("NeHe.bmp");
+	}
+
+	override void OnDrawScene(float time) {
+		auto &gl = GL::Instance();
+
+		gl.Clear();
+
+		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
+
+		gl.MatrixMode(GL_PROJECTION);
+		gl.LoadIdentity();
+		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+
+		gl.LoadIdentity();									// Reset The View
+		gl.Translate(0.0f, 0.0f, -5.0f);
+
+		gl.Rotate(_xrot, 1.0f, 0.0f, 0.0f);
+		gl.Rotate(_yrot, 0.0f, 1.0f, 0.0f);
+		gl.Rotate(_zrot, 0.0f, 0.0f, 1.0f);
+
+		gl.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+		DrawCube();
+
+		_xrot += 0.3f;
+		_yrot += 0.2f;
+		_zrot += 0.4f;
+	}
+
+	void DrawCube() {
+		auto &gl = GL::Instance();
+
+		gl.BindTexture(GL_TEXTURE_2D, _texture);
+
+		gl.Begin(GL_QUADS);
+		// Front Face
+		gl.SetNormal(0.0f, 0.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		// Back Face
+		gl.SetNormal(0.0f, 0.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		// Top Face
+		gl.SetNormal(0.0f, 1.0f, 0.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		// Bottom Face
+		gl.SetNormal(0.0f, -1.0f, 0.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		// Right face
+		gl.SetNormal(1.0f, 0.0f, 0.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		// Left Face
+		gl.SetNormal(-1.0f, 0.0f, 0.0f);
+		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.End();
+	}
+
+private:
+	shared_ptr<Texture> _texture;
+	float _xrot;
+	float _yrot;
+	float _zrot;
+};
+
+int main() {
 	try {
 		SFMLContext context;
 		context.CreateWindow(800, 600, "title");
@@ -432,7 +522,7 @@ int main() {
 		sf::Clock timer;
 		float last_time = 0;
 
-		unique_ptr<TestCase> testCase = make_unique<NeheBox>();
+		unique_ptr<TestCase> testCase = make_unique<LightTest>();
 		testCase->Init(context);
 
 		while (window.lock()->isOpen())

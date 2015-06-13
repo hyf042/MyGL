@@ -4,9 +4,11 @@
 #include <map>
 #include <set>
 #include "Consts.h"
+#include "Structures/Color.h"
 #include "MatrixWrapper.h"
 #include "Texture.h"
-#include "Structures/Color.h"
+#include "Material.h"
+#include "Light.h"
 
 namespace MyGL {
 	using std::map;
@@ -35,6 +37,10 @@ namespace MyGL {
 		Clockwise frontFace = GL_CCW;
 		// texture targets.
 		map<TextureTarget, shared_ptr<Texture>> textureTargets;
+		// light
+		vector<shared_ptr<Light>> lights;
+		// current material configure.
+		Material material = Material();
 		// flags.
 		set<GLFlag> flags;
 		// src blend mode.
@@ -46,6 +52,11 @@ namespace MyGL {
 
 		GLState() {
 			flags.insert(GL_DEPTH_TEST);
+
+			// init default lights
+			for (int i = 0; i < GL_DEFAULT_LIGHT_NUM; i++) {
+				lights.push_back(i == 0 ? Light::CreateLight0() : make_shared<Light>());
+			}
 		}
 
 		void LoadIdentity() {
@@ -68,8 +79,11 @@ namespace MyGL {
 			}
 		}
 
-		Vector3 ModelToCameraSpace(Vector3 point) {
+		Vector3 ModelToWorldSpace(Vector3 point) {
 			return modelViewMatrix.get_matrix() * point;
+		}
+		Vector3 VectorToWorldSpace(Vector3 vec) {
+			return modelViewMatrix.get_matrix() * Vector4::Of(vec, true);
 		}
 		Vector3 ModelToProjectionSpace(Vector3 point) {
 			return projectionMatrix.get_matrix() * modelViewMatrix.get_matrix() * point;

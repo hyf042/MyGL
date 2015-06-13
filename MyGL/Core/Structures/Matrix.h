@@ -162,6 +162,16 @@ namespace MyGL {
 		}
 		return result;
 	}
+	// the order for template match is operator*(Matrix<4,4>, vector3) > operator*<R, C>, thus we need to specify this implementation.
+	inline Vector4 operator*(const Matrix<4, 4> &lhs, const Vector4 &rhs) {
+		Vector4 result;
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				result[i] += lhs[i][j] * rhs[j];
+			}
+		}
+		return result;
+	}
 
 	typedef Matrix<4, 4> Matrix4x4;
 	typedef Matrix<3, 3> Matrix3x3;

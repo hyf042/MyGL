@@ -142,9 +142,10 @@ namespace MyGL {
 			return AddVertex(Vector3(x, y, z));
 		}
 		GL& AddVertex(const Vector3 &position) {
-			Vector3 world_position = position;
+			Vector3 world_position;
 			auto viewport_position = _state.ModelToViewport(position, world_position);
-			_primitvesBuilder->AddVertex(Vertex(viewport_position, _state.vertexColor, _state.vertexUV, _state.vertexNormal, world_position.z()));
+			Vector3 normal = _state.VectorToWorldSpace(_state.vertexNormal);
+			_DealCreateVertex(viewport_position, world_position, _state.vertexColor, _state.vertexUV, normal);
 			return *this;
 		}
 
@@ -210,6 +211,128 @@ namespace MyGL {
 		}
 
 		/*
+		 * Lighting
+		 **/
+		GL& Enable(LightEnum light) {
+			_state.lights[light]->set_enabled(true);
+			return *this;
+		}
+		GL& Disable(LightEnum light) {
+			_state.lights[light]->set_enabled(false);
+			return *this;
+		}
+		GL& SetLightParameter(LightEnum light, LightParameter parameter, Color color) {
+			switch (parameter) {
+			case GL_AMBIENT:
+				_state.lights[light]->set_ambient(color);
+				break;
+			case GL_DIFFUSE:
+				_state.lights[light]->set_diffuse(color);
+				break;
+			case GL_SPECULAR:
+				_state.lights[light]->set_specular(color);
+				break;
+			default:
+				throw Exception::NotImplementationException();
+			}
+			return *this;
+		}
+		GL& SetLightParameter(LightEnum light, LightParameter parameter, Vector4 position) {
+			switch (parameter) {
+			case GL_POSITION:
+				_state.lights[light]->set_position(position);
+				break;
+			default:
+				throw Exception::NotImplementationException();
+			}
+			_state.lights[light]->set_position(position);
+			return *this;
+		}
+		GL& SetLightParameter(LightEnum light, LightParameter parameter, Vector3 direction) {
+			switch (parameter) {
+			case GL_SPOT_DIRECTION:
+				break;
+			default:
+				throw Exception::NotImplementationException();
+			}
+			return *this;
+		}
+		GL& SetLightParameter(LightEnum light, LightParameter parameter, float val) {
+			switch (parameter) {
+			case GL_CONSTANT_ATTENUATION:
+				_state.lights[light]->set_constant_attenuation(val);
+				break;
+			case GL_LINEAR_ATTENUATION:
+				_state.lights[light]->set_linear_attenuation(val);
+				break;
+			case GL_QUADRATIC_ATTENUATION:
+				_state.lights[light]->set_quadratic_attenuation(val);
+				break;
+			case GL_SPOT_CUTOFF:
+			case GL_SPOT_EXPONENT:
+			default:
+				throw Exception::NotImplementationException();
+			}
+			return *this;
+		}
+		GL& SetMaterial(LightParameter parameter, Color color) {
+			switch (parameter) {
+			case GL_AMBIENT:
+				_state.material.set_ambient(color);
+				break;
+			case GL_DIFFUSE:
+				_state.material.set_diffuse(color);
+				break;
+			case GL_SPECULAR:
+				_state.material.set_specular(color);
+				break;
+			case GL_AMBIENT_AND_DIFFUSE:
+				_state.material.set_ambient(color);
+				_state.material.set_diffuse(color);
+				break;
+			case GL_EMISSION:
+				_state.material.set_emission(color);
+			default:
+				throw Exception::NotImplementationException();
+			}
+			return *this;
+		}
+		GL& SetMaterial(LightParameter parameter, float val) {
+			switch (parameter) {
+			case GL_SHININESS:
+				_state.material.set_shininess(val);
+				break;
+			default:
+				throw Exception::NotImplementationException();
+			}
+			return *this;
+		}
+		weak_ptr<Light> GenLight() {
+			auto light = make_shared<Light>();
+			_state.lights.push_back(light);
+			return light;
+		}
+		bool RemoveLight(weak_ptr<Light> light) {
+			for (auto iter = _state.lights.begin(); iter != _state.lights.end(); iter++) {
+				if (iter->get() == light.lock().get()) {
+					_state.lights.erase(iter);
+					return true;
+				}
+			}
+			return false;
+		}
+		Color GetLightingColor(const Vector3 &position, const Vector3 &normal) {
+			Color color = Color(0, 0, 0, 0);
+			for (auto light : _state.lights) {
+				if (light->enabled()) {
+					color = color + light->Calculate(position, normal, _state.material);
+				}
+			}
+			color.Normalize();
+			return color;
+		}
+
+		/*
 		 * Flags & Settings
 		 **/
 		GL& CullFace(CullFaceMask cullFace) {
@@ -269,6 +392,9 @@ namespace MyGL {
 		static Vector4 GetBlendFactor(BlendMode blendMode, Color src, Color dst);
 		bool TestZCulling(const Vertex &v1, const Vertex &v2, const Vertex &v3);
 		bool DepthTest(const Fragment &fragment);
+		Vector3 TransformToWorld(const Vector3 &position) {
+			return _state.ModelToWorldSpace(position);
+		}
 
 	private:
 		GL() : _clipping(new Clipping()) {}
@@ -281,6 +407,7 @@ namespace MyGL {
 		 * Vertex Pipeline
 		 */
 		void _DoVertexPipeline(const unique_ptr<Primitives> &primitives);
+		void _DealCreateVertex(const Vector3 &viewport_position, const Vector3 &world_position, const Color &color, const Vector2 &uv, const Vector3 &normal);
 
 		/**
 		 * Fragment Pipeline

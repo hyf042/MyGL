@@ -8,6 +8,7 @@
 namespace MyGL {
 	class Color {
 	public:
+		Color() : _a(1.0f), _r(0.0f), _g(0.0f), _b(0.0f) {}
 		Color(int _r, int _g, int _b) : _r(_r / 255.0f), _g(_g / 255.0f), _b(_b / 255.0f), _a(1.0f) {}
 		Color(int _r, int _g, int _b, int _a) : _r(_r / 255.0f), _g(_g / 255.0f), _b(_b / 255.0f), _a(_a / 255.0f) {}
 		Color(float _r, float _g, float _b) : _r(_r), _g(_g), _b(_b), _a(1.0f) {}

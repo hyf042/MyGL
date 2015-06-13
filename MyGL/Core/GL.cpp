@@ -63,6 +63,15 @@ namespace MyGL {
 		}
 	}
 
+	void GL::_DealCreateVertex(const Vector3 &viewport_position, const Vector3 &world_position, const Color &color, const Vector2 &uv, const Vector3 &normal) {
+		if (IsEnable(GL_LIGHTING)) {
+			_primitvesBuilder->AddVertex(Vertex(viewport_position, GetLightingColor(world_position, normal), uv, normal, world_position.z()));
+		}
+		else {
+			_primitvesBuilder->AddVertex(Vertex(viewport_position, color, uv, normal, world_position.z()));
+		}
+	}
+
 	void GL::_DoFragmentPipeline(const Fragment &fragment) {
 		// Depth test
 		if (IsEnable(GL_DEPTH_TEST)) {
