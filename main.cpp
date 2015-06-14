@@ -12,6 +12,8 @@ public:
 
 class TwoMesh : public TestCase {
 public:
+	virtual ~TwoMesh() {}
+
 	override void Init(SFMLContext &context) {
 		GL::Instance().Disable(GL_DEPTH_TEST);
 	}
@@ -97,6 +99,8 @@ public:
 
 class NeheBox : public TestCase {
 public:
+	virtual ~NeheBox() {}
+
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
 		_texture = context.LoadTexture("NeHe.bmp");
@@ -176,6 +180,8 @@ private:
 
 class TextureWrap : public TestCase {
 public:
+	virtual ~TextureWrap() {}
+
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
 		_texture = context.LoadTexture("NeHe.bmp");
@@ -256,6 +262,8 @@ private:
 
 class TextureFilter : public TestCase {
 public:
+	virtual ~TextureFilter() {}
+
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
 		_texture = context.LoadTexture("NeHe.bmp");
@@ -330,6 +338,8 @@ private:
 
 class AlphaBox : public TestCase {
 public:
+	virtual ~AlphaBox() {}
+
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
 		gl.Enable(GL_BLEND);
@@ -422,15 +432,16 @@ private:
 
 class LightTest : public TestCase {
 public:
+	virtual ~LightTest() {}
+
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
 
 		gl.Enable(GL_LIGHTING);
-		gl.Enable(GL_LIGHT0);
 		gl.Enable(GL_LIGHT1);
-		gl.SetLightParameter(GL_LIGHT1, GL_AMBIENT, Color(0.0f, 0.0f, 0.0f, 1.0f));
+		gl.SetLightParameter(GL_LIGHT1, GL_AMBIENT, Color(0.5f, 0.5f, 0.5f, 1.0f));
 		gl.SetLightParameter(GL_LIGHT1, GL_DIFFUSE, Color(1.0f, 1.0f, 1.0f, 1.0f));
-		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(0.0f, 1.0f, 0.0f, 0.0f));
+		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(0.0f, 0.0f, 2.0f, 1.0f));
 
 		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
 
@@ -450,14 +461,14 @@ public:
 		gl.LoadIdentity();									// Reset The View
 		gl.Translate(0.0f, 0.0f, _z);
 
-		gl.Rotate(45.0f, 1.0f, 0.0f, 0.0f);
-		gl.Rotate(0, 0.0f, 1.0f, 0.0f);
+		gl.Rotate(_xrot, 1.0f, 0.0f, 0.0f);
+		gl.Rotate(_yrot, 0.0f, 1.0f, 0.0f);
 
 		gl.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 		DrawCube();
 
-		_xrot += _xspeed;
-		_yrot += _yspeed;
+		_xrot += _xspeed * 5;
+		_yrot += _yspeed * 5;
 	}
 
 	void DrawCube() {
@@ -550,7 +561,6 @@ int main() {
 		int frame_count = 0;
 		sf::Clock fps_elapsed;
 		sf::Clock timer;
-		float last_time = 0;
 
 		unique_ptr<TestCase> testCase = make_unique<LightTest>();
 		testCase->Init(context);

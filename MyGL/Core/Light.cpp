@@ -7,27 +7,58 @@ namespace MyGL {
 		const Material& material = state.material;
 
 		Vector3 light;
+		Color final_color(0.0f, 0.0f, 0.0f, 0.0f);
 		float attenuation_factor = 1.0f;
+
 		if (IsDirection()) {
 			// direction light do not need attenuation.
 			light = -_position.AsVector3();
+			light.Normalize();
 		}
 		else {
+			// in default, the point light is equal to a half-space spotlight.
 			light = _position.AsVector3() - world_position;
+			light.Normalize();
+
+			// attenuation
 			attenuation_factor = GetAttenuationFactor(light.Length());
+
+			// spotlight factor
+			auto direction = _spot_direction.Unit();
+			float cos_cur_angle = Dot(-light, direction);
+			float cos_inner_cone_angle = Math::Cos(Math::Degree2Radian(_spot_cutoff));
+			float cos_outer_cone_angle = Math::Cos(Math::Degree2Radian(_spot_cutoff + _spot_outer_delta_angle));
+
+			float spot = 0.0f;
+			if (!Math::IsZero(cos_inner_cone_angle - cos_outer_cone_angle)) {
+				spot = Math::Clamp(
+					(cos_cur_angle - cos_outer_cone_angle) / (cos_inner_cone_angle - cos_outer_cone_angle),
+					0.0f, 1.0f);
+			}
+			else {
+				if (cos_cur_angle < cos_inner_cone_angle) {
+					int tmp = 1;
+				}
+				spot = cos_cur_angle >= cos_inner_cone_angle ? 1.0f : 0.0f;
+			}
+			attenuation_factor *= spot;
 		}
-		light.Normalize();
-
+		
 		// diffuse
-		auto diffuse = Math::Max(0.0f, Dot(normal, light));
-		auto diffuse_color = _diffuse * material.diffuse() * diffuse;
+		auto lambert_term = Math::Max(0.0f, Dot(normal, light));
 
-		// specular
-		auto reflect = 2 * normal * Dot(normal, light) - light;
-		auto view = -world_position.Unit();
-		// world_position is the vector from camera (0, 0, 0) to the vertex, so negative one is the vector from vertex to camerea.
-		auto specular = diffuse <= 0 ? 0 : Math::Power(Math::Max(0.0f, Dot(reflect, view)), material.shinness());
-		auto specular_color = _specular * material.specular() * specular;
+		if (lambert_term > 0.0f) {
+			auto diffuse_color = _diffuse * material.diffuse() * lambert_term;
+
+			// specular
+			auto reflect = Reflect(light, normal);
+			auto view = -world_position.Unit();
+			// world_position is the vector from camera (0, 0, 0) to the vertex, so negative one is the vector from vertex to camerea.
+			auto specular = Math::Power(Math::Max(0.0f, Dot(reflect, view)), material.shinness());
+			auto specular_color = _specular * material.specular() * specular;
+
+			final_color += (diffuse_color + specular_color) * attenuation_factor;
+		}
 
 		// ambient
 		auto ambient_color = (_ambient + state.ambient) * material.ambient();
@@ -35,7 +66,7 @@ namespace MyGL {
 		// emission
 		auto emission_color = material.emission();
 
-		auto final_color = diffuse_color + specular_color + ambient_color + emission_color;
+		final_color += ambient_color + emission_color;
 		final_color.Normalize();
 		final_color.set_a(1.0f);
 		return final_color;

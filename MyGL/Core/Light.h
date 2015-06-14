@@ -23,6 +23,9 @@ namespace MyGL {
 		float GetAttenuationFactor(float distance) const {
 			return 1 / (_attenuation.x() + _attenuation.y() * distance + _attenuation.z() * distance * distance);
 		}
+		Vector3 Reflect(const Vector3& v, const Vector3& normal) {
+			return 2 * normal * Dot(normal, v) - v;
+		}
 		void SetDirectionLight(Vector3 direction) {
 			set_position(Vector4(direction.x(), direction.y(), direction.z(), 0.0f));
 		}
@@ -57,6 +60,9 @@ namespace MyGL {
 		float spot_cutoff() const {
 			return _spot_cutoff;
 		}
+		float spot_cutoff_delta_angle() const {
+			return _spot_outer_delta_angle;
+		}
 		void set_position(const Vector4 &position);
 		void set_diffuse(const Color &diffuse) {
 			_diffuse = diffuse;
@@ -83,7 +89,10 @@ namespace MyGL {
 			_spot_exponent = exponent;
 		}
 		void set_spot_cutoff(float cutoff) {
-			_spot_cutoff = Math::Clamp(cutoff, 0.0f, 360.0f);
+			_spot_cutoff = Math::Clamp(cutoff, 0.0f, 180.0f);
+		}
+		void set_spot_outer_delta_angle(float angle) {
+			_spot_outer_delta_angle = angle;
 		}
 
 		static shared_ptr<Light> CreateLight0() {
@@ -104,8 +113,10 @@ namespace MyGL {
 		Vector3 _spot_direction = Vector3(0.0f, 0.0f, -1.0f);
 		// spotlight exponent
 		float _spot_exponent = 0.0f;
-		// spotlight cutoff angle in degree
+		// spotlight cutoff angle in degree (half).
 		float _spot_cutoff = 180.0f;
+		// spotlight cutoff outer angle minus inner angle (half)
+		float _spot_outer_delta_angle = 0.0f;
 	};
 }
 

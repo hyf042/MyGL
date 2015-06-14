@@ -245,7 +245,6 @@ namespace MyGL {
 			default:
 				throw Exception::NotImplementationException();
 			}
-			_state.lights[light]->set_position(position);
 			return *this;
 		}
 		GL& SetLightParameter(LightEnum light, LightParameter parameter, Vector3 direction) {
@@ -397,6 +396,15 @@ namespace MyGL {
 		}
 		Vector3 TransformNormalToWorld(const Vector3 &position) {
 			return _state.NormalToWorldSpace(position);
+		}
+		Color GetColor(const Fragment &fragment) {
+			if (IsEnable(GL_LIGHTING)) {
+				// Use Phong Shading, deal with per-vertex.
+				return GetLightingColor(fragment.world_position(), fragment.normal());
+			}
+			else {
+				return fragment.color();
+			}
 		}
 
 	private:

@@ -51,6 +51,11 @@ namespace MyGL {
 		inline void set_g(float val) { _g = val; }
 		inline void set_b(float val) { _b = val; }
 
+		Color& operator+=(const Color &other) {
+			*this = *this + other;
+			return *this;
+		}
+
 		static Color Lerp(const Color &from, const Color &to, float ratio) {
 			return Color(
 				Math::Lerp(from._r, to._r, ratio),

@@ -28,7 +28,7 @@ namespace MyGL {
 		inline const Vector3& position() const {
 			return _position;
 		}
-		inline const Vector3& world_position() {
+		inline const Vector3& world_position() const {
 			return _world_position;
 		}
 		inline void set_position(const Vector3 &position) {
