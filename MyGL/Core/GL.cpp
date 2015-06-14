@@ -65,10 +65,11 @@ namespace MyGL {
 
 	void GL::_DealCreateVertex(const Vector3 &viewport_position, const Vector3 &world_position, const Color &color, const Vector2 &uv, const Vector3 &normal) {
 		if (IsEnable(GL_LIGHTING)) {
-			_primitvesBuilder->AddVertex(Vertex(viewport_position, GetLightingColor(world_position, normal), uv, normal, world_position.z()));
+			// Use Gouraud Shading, deal with per-vertex.
+			_primitvesBuilder->AddVertex(Vertex(viewport_position, GetLightingColor(world_position, normal), uv, normal, world_position));
 		}
 		else {
-			_primitvesBuilder->AddVertex(Vertex(viewport_position, color, uv, normal, world_position.z()));
+			_primitvesBuilder->AddVertex(Vertex(viewport_position, color, uv, normal, world_position));
 		}
 	}
 

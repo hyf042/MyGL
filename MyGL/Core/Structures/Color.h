@@ -6,6 +6,7 @@
 #include "Structures/Vector.h"
 
 namespace MyGL {
+	// the color used in sfml is ABGR
 	class Color {
 	public:
 		Color() : _a(1.0f), _r(0.0f), _g(0.0f), _b(0.0f) {}
@@ -13,7 +14,9 @@ namespace MyGL {
 		Color(int _r, int _g, int _b, int _a) : _r(_r / 255.0f), _g(_g / 255.0f), _b(_b / 255.0f), _a(_a / 255.0f) {}
 		Color(float _r, float _g, float _b) : _r(_r), _g(_g), _b(_b), _a(1.0f) {}
 		Color(float _r, float _g, float _b, float _a) : _r(_r), _g(_g), _b(_b), _a(_a) {}
-		Color(uint32 col) : _a(((col>>24)&0xff)/255.0f), _r(((col>>16)&0xff)/255.0f), _g(((col>>8)&0xff)/255.0f), _b(((col&0xFF)&0xff)/255.0f) {}
+		Color(uint32 col) : _a(((col>>24)&0xff)/255.0f), _b(((col>>16)&0xff)/255.0f), _g(((col>>8)&0xff)/255.0f), _r(((col&0xFF)&0xff)/255.0f) {
+			int tmp = 1;
+		}
 
 		Color Normalize() {
 			_a = Math::Clamp(_a, 0.f, 1.f);
@@ -25,7 +28,7 @@ namespace MyGL {
 
 		uint32 GetDword() {
 			Normalize();
-			return ((uint8(_a * 255.0f)) << 24) + ((uint8(_r * 255.0f)) << 16) + ((uint8(_g * 255.0f)) << 8) + ((uint8(_b * 255.0f)) << 0);
+			return ((uint8(_a * 255.0f)) << 24) + ((uint8(_b * 255.0f)) << 16) + ((uint8(_g * 255.0f)) << 8) + ((uint8(_r * 255.0f)) << 0);
 		}
 
 		void GetBytes(uint8 &r, uint8 &g, uint8 &b, uint8 &a) {

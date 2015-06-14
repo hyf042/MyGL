@@ -11,7 +11,7 @@ namespace MyGL {
 		Vertex(const Vector3 &position) : _position(position), _color(Colors::White) {}
 		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv) : _position(position), _uv(uv), _color(color) {}
 		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv, const Vector3 &normal) : _position(position), _uv(uv), _color(color), _normal(normal) {}
-		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv, const Vector3 &normal, float world_z) : _position(position), _uv(uv), _color(color), _normal(normal), _world_z(world_z) {}
+		Vertex(const Vector3 &position, const Color &color, const Vector2 &uv, const Vector3 &normal, const Vector3& world_position) : _position(position), _uv(uv), _color(color), _normal(normal), _world_position(world_position) {}
 
 		inline float x() const {
 			return _position.x();
@@ -23,10 +23,13 @@ namespace MyGL {
 			return _position.z();
 		}
 		inline float world_z() const {
-			return _world_z;
+			return _world_position.z();
 		}
 		inline const Vector3& position() const {
 			return _position;
+		}
+		inline const Vector3& world_position() {
+			return _world_position;
 		}
 		inline void set_position(const Vector3 &position) {
 			_position = position;
@@ -47,7 +50,7 @@ namespace MyGL {
 				Color::Lerp(from._color, to._color, ratio),
 				LerpUVWithPerspectiveCorrectness(from, to, ratio),
 				Vector3::Lerp(from._normal, to._normal, ratio),
-				Math::Lerp(from.world_z(), to.world_z(), ratio));
+				Vector3::Lerp(from._world_position, to._world_position, ratio));
 		}
 
 		// Lerps the uv of vertex with perspective correctness, see https://en.wikipedia.org/wiki/Texture_mapping#Perspective_correctness for details.
@@ -60,8 +63,7 @@ namespace MyGL {
 		Vector2 _uv;
 		Vector3 _normal;
 		Color _color;
-		// used to do perspective correction
-		float _world_z = 0;
+		Vector3 _world_position;
 	};
 
 	class Fragment : public Vertex {

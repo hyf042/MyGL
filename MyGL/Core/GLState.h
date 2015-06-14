@@ -39,6 +39,8 @@ namespace MyGL {
 		map<TextureTarget, shared_ptr<Texture>> textureTargets;
 		// light
 		vector<shared_ptr<Light>> lights;
+		// global ambient light
+		Color ambient = Color(0.2f, 0.2f, 0.2f, 1.0f);
 		// current material configure.
 		Material material = Material();
 		// flags.
@@ -83,7 +85,10 @@ namespace MyGL {
 			return modelViewMatrix.get_matrix() * point;
 		}
 		Vector3 NormalToWorldSpace(Vector3 vec) {
-			return modelViewMatrix.get_inverse().Transpose() * Vector4::Of(vec, true);
+			// here we take transpose of inverse matrix, in order to transform normal correctly,
+			// for more details, see http://www.glprogramming.com/red/appendixf.html
+			// notice we strip w(), since normal do not need translation.
+			return (modelViewMatrix.get_inverse().Transpose() * Vector4::Of(vec, true)).StripLast();
 		}
 		Vector3 ModelToProjectionSpace(Vector3 point) {
 			return projectionMatrix.get_matrix() * modelViewMatrix.get_matrix() * point;

@@ -140,7 +140,7 @@ namespace MyGL {
 		friend float Dot(const Vector &lhs, const Vector &rhs) {
 			float sum = 0;
 			for (int i = 0; i < SIZE; i++) {
-				sum = lhs._values[i] * rhs._values[i];
+				sum += lhs._values[i] * rhs._values[i];
 			}
 			return sum;
 		}
@@ -294,6 +294,7 @@ namespace MyGL {
 		static Vector4 Of(const Vector3 &v3, bool isVector = false);
 		operator Vector3();
 		Vector3 AsVector3() const;
+		Vector3 StripLast() const;
 
 		Vector4 Unit() const {
 			auto normalized = Clone();

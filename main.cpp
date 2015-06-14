@@ -7,6 +7,7 @@ class TestCase {
 public:
 	virtual void Init(SFMLContext &context) = 0;
 	virtual void OnDrawScene(float time) = 0;
+	virtual void OnUpdate(float time) {}
 };
 
 class TwoMesh : public TestCase {
@@ -423,20 +424,13 @@ class LightTest : public TestCase {
 public:
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
-		gl.Enable(GL_LIGHTING);
 
+		gl.Enable(GL_LIGHTING);
+		gl.Enable(GL_LIGHT0);
 		gl.Enable(GL_LIGHT1);
 		gl.SetLightParameter(GL_LIGHT1, GL_AMBIENT, Color(0.0f, 0.0f, 0.0f, 1.0f));
 		gl.SetLightParameter(GL_LIGHT1, GL_DIFFUSE, Color(1.0f, 1.0f, 1.0f, 1.0f));
-		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(-1.0f, -1.0f, -1.0f, 1.0f));
-
-		_texture = context.LoadTexture("NeHe.bmp");
-	}
-
-	override void OnDrawScene(float time) {
-		auto &gl = GL::Instance();
-
-		gl.Clear();
+		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(0.0f, 1.0f, 0.0f, 0.0f));
 
 		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
 
@@ -444,19 +438,26 @@ public:
 		gl.LoadIdentity();
 		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
 
-		gl.LoadIdentity();									// Reset The View
-		gl.Translate(0.0f, 0.0f, -5.0f);
+		_texture = context.LoadTexture("Crate.bmp");
+	}
 
-		gl.Rotate(_xrot, 1.0f, 0.0f, 0.0f);
-		gl.Rotate(_yrot, 0.0f, 1.0f, 0.0f);
-		gl.Rotate(_zrot, 0.0f, 0.0f, 1.0f);
+	override void OnDrawScene(float time) {
+		auto &gl = GL::Instance();
+
+		gl.Clear();
+
+		gl.MatrixMode(GL_MODEVIEW);
+		gl.LoadIdentity();									// Reset The View
+		gl.Translate(0.0f, 0.0f, _z);
+
+		gl.Rotate(45.0f, 1.0f, 0.0f, 0.0f);
+		gl.Rotate(0, 0.0f, 1.0f, 0.0f);
 
 		gl.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 		DrawCube();
 
-		_xrot += 0.3f;
-		_yrot += 0.2f;
-		_zrot += 0.4f;
+		_xrot += _xspeed;
+		_yrot += _yspeed;
 	}
 
 	void DrawCube() {
@@ -504,11 +505,40 @@ public:
 		gl.End();
 	}
 
+	override void OnUpdate(float time) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L)) {
+			_isLighting = !_isLighting;
+			if (!_isLighting)
+			{
+				GL::Instance().Disable(GL_LIGHTING);
+			}
+			else
+			{
+				GL::Instance().Enable(GL_LIGHTING);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
+			_xspeed -= 0.01f;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
+			_xspeed += 0.01f;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
+			_yspeed -= 0.01f;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
+			_yspeed += 0.01f;
+		}
+	}
+
 private:
 	shared_ptr<Texture> _texture;
 	float _xrot;
 	float _yrot;
-	float _zrot;
+	float _xspeed = 0;				// X Rotation Speed
+	float _yspeed = 0;				// Y Rotation Speed
+	bool _isLighting = true;
+	float _z = -5.0f;
 };
 
 int main() {
@@ -544,7 +574,9 @@ int main() {
 			}
 
 			frame_count++;
-			testCase->OnDrawScene(timer.getElapsedTime().asSeconds());
+			float time = timer.getElapsedTime().asSeconds();
+			testCase->OnUpdate(time);
+			testCase->OnDrawScene(time);
 
 			context.SwapBuffers();
 		}

@@ -10,6 +10,9 @@ namespace MyGL {
 			return Vector3(x() / _w, y() / _w, z() / _w);
 		}
 	}
+	Vector3 Vector4::StripLast() const {
+		return Vector3(x(), y(), z());
+	}
 	Vector4::operator Vector3() {
 		return  AsVector3();
 	}

@@ -238,9 +238,11 @@ namespace MyGL {
 				for (int j = i; j < SIZE; j++) {
 					if (!Math::IsZero(clone[i][j])) {
 						// inverse i and j row
-						for (int k = 0; k < SIZE; k++) {
-							std::swap(clone[i][k], clone[j][k]);
-							std::swap(inverse[i][k], inverse[j][k]);
+						if (i != j) {
+							for (int k = 0; k < SIZE; k++) {
+								std::swap(clone[i][k], clone[j][k]);
+								std::swap(inverse[i][k], inverse[j][k]);
+							}
 						}
 						break;
 					}
@@ -260,7 +262,20 @@ namespace MyGL {
 					if (!Math::IsZero(val)) {
 						for (int k = 0; k < SIZE; k++) {
 							clone[j][k] -= val * clone[i][k];
-							inverse[j][k] -= val * clone[j][k];
+							inverse[j][k] -= val * inverse[i][k];
+						}
+					}
+				}
+			}
+
+			// roll back
+			for (int i = SIZE - 1; i >= 0; --i) {
+				for (int j = i - 1; j >= 0; --j) {
+					float val = clone[j][i];
+					if (!Math::IsZero(val)) {
+						for (int k = 0; k < SIZE; k++) {
+							clone[j][k] -= val * clone[i][k];
+							inverse[j][k] -= val * inverse[i][k];
 						}
 					}
 				}

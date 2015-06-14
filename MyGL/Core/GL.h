@@ -325,7 +325,7 @@ namespace MyGL {
 			Color color = Color(0, 0, 0, 0);
 			for (auto light : _state.lights) {
 				if (light->enabled()) {
-					color = color + light->Calculate(position, normal, _state.material);
+					color = color + light->Calculate(position, normal, _state);
 				}
 			}
 			color.Normalize();
@@ -392,8 +392,11 @@ namespace MyGL {
 		static Vector4 GetBlendFactor(BlendMode blendMode, Color src, Color dst);
 		bool TestZCulling(const Vertex &v1, const Vertex &v2, const Vertex &v3);
 		bool DepthTest(const Fragment &fragment);
-		Vector3 TransformToWorld(const Vector3 &position) {
+		Vector3 TransformPointToWorld(const Vector3 &position) {
 			return _state.ModelToWorldSpace(position);
+		}
+		Vector3 TransformNormalToWorld(const Vector3 &position) {
+			return _state.NormalToWorldSpace(position);
 		}
 
 	private:

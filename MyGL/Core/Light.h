@@ -3,15 +3,16 @@
 
 #include "Structures/Vector.h"
 #include "Structures/Color.h"
-#include "Material.h"
 
 namespace MyGL {
+	class GLState;
+
 	class Light {
 	public:
 		Light() {}
 		virtual ~Light() {}
 
-		virtual Color Calculate(const Vector3 &world_position, const Vector3& normal, const Material &material);
+		virtual Color Calculate(const Vector3 &world_position, const Vector3& normal, const GLState &material);
 
 		bool IsPoint() const {
 			return !IsDirection();
@@ -47,6 +48,15 @@ namespace MyGL {
 		Color ambient() const {
 			return _ambient;
 		}
+		Vector3 spot_direction() const {
+			return _spot_direction;
+		}
+		float spot_exponent() const {
+			return _spot_exponent;
+		}
+		float spot_cutoff() const {
+			return _spot_cutoff;
+		}
 		void set_position(const Vector4 &position);
 		void set_diffuse(const Color &diffuse) {
 			_diffuse = diffuse;
@@ -66,6 +76,15 @@ namespace MyGL {
 		void set_quadratic_attenuation(float val) {
 			_attenuation.set_z(val);
 		}
+		void set_spot_direction(const Vector3 &direction) {
+			_spot_direction = direction;
+		}
+		void set_spot_exponent(float exponent) {
+			_spot_exponent = exponent;
+		}
+		void set_spot_cutoff(float cutoff) {
+			_spot_cutoff = Math::Clamp(cutoff, 0.0f, 360.0f);
+		}
 
 		static shared_ptr<Light> CreateLight0() {
 			auto light = make_shared<Light>();
@@ -81,6 +100,12 @@ namespace MyGL {
 		Color _ambient = Color(0.0f, 0.0f, 0.0f, 1.0f);
 		// (constant attenuation, linear attenuation, quadratic attenuation)
 		Vector3 _attenuation = Vector3(1.0f, 0.0f, 0.0f);
+		// (x, y, z) direction of spotlight 
+		Vector3 _spot_direction = Vector3(0.0f, 0.0f, -1.0f);
+		// spotlight exponent
+		float _spot_exponent = 0.0f;
+		// spotlight cutoff angle in degree
+		float _spot_cutoff = 180.0f;
 	};
 }
 
