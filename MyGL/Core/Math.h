@@ -115,10 +115,10 @@ namespace MyGL {
 		static inline bool IsPowerOf2(int val) {
 			return val >= 0 && val == LOWBIT(val);
 		}
-		static inline float Degree2Radian(float degree) {
+		static inline float Deg2Rad(float degree) {
 			return degree * Pi / 180.0f;
 		}
-		static inline float Radian2Degree(float radian) {
+		static inline float Rad2Deg(float radian) {
 			return radian * 180.0f / Pi;
 		}
 

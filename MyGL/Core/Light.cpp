@@ -26,8 +26,8 @@ namespace MyGL {
 			// spotlight factor
 			auto direction = _spot_direction.Unit();
 			float cos_cur_angle = Dot(-light, direction);
-			float cos_inner_cone_angle = Math::Cos(Math::Degree2Radian(_spot_cutoff));
-			float cos_outer_cone_angle = Math::Cos(Math::Degree2Radian(_spot_cutoff + _spot_outer_delta_angle));
+			float cos_inner_cone_angle = Math::Cos(Math::Deg2Rad(_spot_cutoff));
+			float cos_outer_cone_angle = Math::Cos(Math::Deg2Rad(_spot_cutoff + _spot_outer_delta_angle));
 
 			float spot = 0.0f;
 			if (!Math::IsZero(cos_inner_cone_angle - cos_outer_cone_angle)) {
@@ -40,6 +40,9 @@ namespace MyGL {
 					int tmp = 1;
 				}
 				spot = cos_cur_angle >= cos_inner_cone_angle ? 1.0f : 0.0f;
+			}
+			if (spot > 0) {
+				spot = Math::Power(spot, _spot_exponent);
 			}
 			attenuation_factor *= spot;
 		}

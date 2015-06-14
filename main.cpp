@@ -441,7 +441,10 @@ public:
 		gl.Enable(GL_LIGHT1);
 		gl.SetLightParameter(GL_LIGHT1, GL_AMBIENT, Color(0.5f, 0.5f, 0.5f, 1.0f));
 		gl.SetLightParameter(GL_LIGHT1, GL_DIFFUSE, Color(1.0f, 1.0f, 1.0f, 1.0f));
-		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(0.0f, 0.0f, 2.0f, 1.0f));
+		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+		gl.SetLightParameter(GL_LIGHT1, GL_SPOT_EXPONENT, 1.0f);
+		gl.SetLightParameter(GL_LIGHT1, GL_SPOT_CUTOFF, 10.0f);
+		gl.SetLightParameter(GL_LIGHT1, GL_SPOT_OUTER_DELTA_ANGLE, 5.0f);
 
 		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
 
@@ -552,6 +555,90 @@ private:
 	float _z = -5.0f;
 };
 
+class SphereMesh : public TestCase {
+public:
+	virtual ~SphereMesh() {}
+
+	override void Init(SFMLContext &context) {
+		auto &gl = GL::Instance();
+
+		gl.Enable(GL_LIGHTING);
+		gl.Enable(GL_LIGHT1);
+		gl.SetLightParameter(GL_LIGHT1, GL_AMBIENT, Color(0.0f, 0.0f, 0.0f, 1.0f));
+		gl.SetLightParameter(GL_LIGHT1, GL_DIFFUSE, Colors::White);
+		gl.SetLightParameter(GL_LIGHT1, GL_SPECULAR, Colors::White);
+		gl.SetLightParameter(GL_LIGHT1, GL_POSITION, Vector4(-1.0f, -1.0f, -1.0f, 0.0f));
+
+		gl.Viewport(0, 0, 800, 600, 0.0f, 1.0f);
+
+		gl.MatrixMode(GL_PROJECTION);
+		gl.LoadIdentity();
+		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
+
+		_texture = context.LoadTexture("Images/earth.jpg");
+		_sphere = MeshImporter::SharedSphereMesh();
+	}
+
+	override void OnDrawScene(float time) {
+		auto &gl = GL::Instance();
+
+		gl.Clear();
+
+		gl.MatrixMode(GL_MODEVIEW);
+		gl.LoadIdentity();									// Reset The View
+		gl.Translate(0.0f, 0.0f, _z);
+
+		gl.Rotate(_xrot, 1.0f, 0.0f, 0.0f);
+		gl.Rotate(_yrot, 0.0f, 1.0f, 0.0f);
+
+		gl.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+		
+		gl.SetMaterial(GL_SPECULAR, Color(10.0f, 10.0f, 10.0f, 1.0f));
+		gl.SetMaterial(GL_SHININESS, 30.0f);
+		gl.BindTexture(GL_TEXTURE_2D, _texture);
+		_sphere->Draw();
+
+		_xrot += _xspeed * 5;
+		_yrot += _yspeed * 5;
+	}
+
+	override void OnUpdate(float time) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L)) {
+			_isLighting = !_isLighting;
+			if (!_isLighting)
+			{
+				GL::Instance().Disable(GL_LIGHTING);
+			}
+			else
+			{
+				GL::Instance().Enable(GL_LIGHTING);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
+			_xspeed -= 0.01f;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
+			_xspeed += 0.01f;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
+			_yspeed -= 0.01f;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
+			_yspeed += 0.01f;
+		}
+	}
+
+private:
+	shared_ptr<Texture> _texture;
+	shared_ptr<Mesh> _sphere;
+	float _xrot;
+	float _yrot;
+	float _xspeed = 0;				// X Rotation Speed
+	float _yspeed = 0;				// Y Rotation Speed
+	bool _isLighting = true;
+	float _z = -10.0f;
+};
+
 int main() {
 	try {
 		SFMLContext context;
@@ -562,7 +649,7 @@ int main() {
 		sf::Clock fps_elapsed;
 		sf::Clock timer;
 
-		unique_ptr<TestCase> testCase = make_unique<LightTest>();
+		unique_ptr<TestCase> testCase = make_unique<SphereMesh>();
 		testCase->Init(context);
 
 		while (window.lock()->isOpen())

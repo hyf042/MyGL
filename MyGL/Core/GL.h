@@ -23,6 +23,9 @@ namespace MyGL {
 		void ClearDepth(float val = 1.0f);
 		void ClearStencil() { throw Exception::NotImplementationException(); }
 
+		GL& DrawArrays(PrimitivesType mode, const vector<Vector3> &vertices, const vector<Color> &colors, const vector<Vector2> &uvs, const vector<Vector3> &normals);
+		GL& DrawElements(PrimitivesType mode, const vector<Vector3> &vertices, const vector<Color> &colors, const vector<Vector2> &uvs, const vector<Vector3> &normals, const vector<uint32> elements);
+
 		/*
 		 * Matrixs and Transforms
 		 **/
@@ -250,6 +253,7 @@ namespace MyGL {
 		GL& SetLightParameter(LightEnum light, LightParameter parameter, Vector3 direction) {
 			switch (parameter) {
 			case GL_SPOT_DIRECTION:
+				_state.lights[light]->set_spot_direction(direction);
 				break;
 			default:
 				throw Exception::NotImplementationException();
@@ -268,7 +272,14 @@ namespace MyGL {
 				_state.lights[light]->set_quadratic_attenuation(val);
 				break;
 			case GL_SPOT_CUTOFF:
+				_state.lights[light]->set_spot_cutoff(val);
+				break;
 			case GL_SPOT_EXPONENT:
+				_state.lights[light]->set_spot_exponent(val);
+				break;
+			case GL_SPOT_OUTER_DELTA_ANGLE:
+				_state.lights[light]->set_spot_outer_delta_angle(val);
+				break;
 			default:
 				throw Exception::NotImplementationException();
 			}

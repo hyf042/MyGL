@@ -54,6 +54,36 @@ namespace MyGL {
 		}
 	}
 
+	GL& GL::DrawArrays(PrimitivesType mode, const vector<Vector3> &vertices, const vector<Color> &colors, const vector<Vector2> &uvs, const vector<Vector3> &normals) {
+		assert(vertices.size() == colors.size() && colors.size() == uvs.size() && uvs.size() == normals.size());
+		int size = vertices.size();
+
+		Begin(mode);
+		for (int i = 0; i < size; i++) {
+			SetColor(colors[i]);
+			SetUV(uvs[i]);
+			SetNormal(normals[i]);
+			AddVertex(vertices[i]);
+		}
+		End();
+
+		return *this;
+	}
+	GL& GL::DrawElements(PrimitivesType mode, const vector<Vector3> &vertices, const vector<Color> &colors, const vector<Vector2> &uvs, const vector<Vector3> &normals, const vector<uint32> elements) {
+		assert(vertices.size() == colors.size() && colors.size() == uvs.size() && uvs.size() == normals.size());
+		
+		Begin(mode);
+		for (auto i : elements) {
+			SetColor(colors[i]);
+			SetUV(uvs[i]);
+			SetNormal(normals[i]);
+			AddVertex(vertices[i]);
+		}
+		End();
+
+		return *this;
+	}
+
 	/**
 	 * Rendering Pipeline
 	 */
@@ -84,7 +114,8 @@ namespace MyGL {
 		}
 
 		// Set final color
-		_colorBuffer->SetData(fragment.get_output_x(), fragment.get_output_y(), color);
+		// notices SFML use ABGR format, we should convert it into ABGR
+		_colorBuffer->SetData(fragment.get_output_x(), fragment.get_output_y(), color.GetDwordInABGR());
 	}
 
 	Color GL::_DoAlphaBlend(Color src, Color dst, BlendMode srcBlendMode, BlendMode dstBlendMode) {

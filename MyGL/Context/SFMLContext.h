@@ -45,11 +45,22 @@ namespace MyGL {
 			image.loadFromFile(filename);
 			image.flipVertically();
 			auto texture = GL::Instance().GenTexture();
-			texture->SetTexture(image.getSize().x, image.getSize().y, image.getPixelsPtr());
+			// SFML use ABGR format, we should convert it into ARGB
+			auto rawBytes = _ConvertABGRToARGB(image.getPixelsPtr(), image.getSize().x * image.getSize().y);
+			texture->SetTexture(image.getSize().x, image.getSize().y, reinterpret_cast<uint8*>(&rawBytes[0]));
 			return texture;
 		}
 
 	private:
+		static vector<uint32> _ConvertABGRToARGB(const uint8 *bytes, int size) {
+			const uint32 *dwords = reinterpret_cast<const uint32*>(bytes);
+			vector<uint32> ret;
+			for (int i = 0; i < size; i++) {
+				ret.push_back(Color::OfABGR(dwords[i]));
+			}
+			return ret;
+		}
+
 		shared_ptr<sf::RenderWindow> _window;
 		shared_ptr<sf::Texture> _texture;
 		shared_ptr<sf::Sprite> _sprite;
