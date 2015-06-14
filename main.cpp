@@ -103,7 +103,7 @@ public:
 
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
-		_texture = context.LoadTexture("NeHe.bmp");
+		_texture = context.LoadTexture("Images/nehe.bmp");
 	}
 
 	override void OnDrawScene(float time) {
@@ -184,7 +184,7 @@ public:
 
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
-		_texture = context.LoadTexture("NeHe.bmp");
+		_texture = context.LoadTexture("Images/nehe.bmp");
 	}
 
 	override void OnDrawScene(float time) {
@@ -266,7 +266,7 @@ public:
 
 	override void Init(SFMLContext &context) {
 		auto &gl = GL::Instance();
-		_texture = context.LoadTexture("NeHe.bmp");
+		_texture = context.LoadTexture("Images/nehe.bmp");
 	}
 
 	override void OnDrawScene(float time) {
@@ -345,7 +345,7 @@ public:
 		gl.Enable(GL_BLEND);
 		gl.Disable(GL_DEPTH_TEST);
 		gl.BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		_texture = context.LoadTexture("NeHe.bmp");
+		_texture = context.LoadTexture("Images/nehe.bmp");
 	}
 
 	override void OnDrawScene(float time) {
@@ -449,7 +449,7 @@ public:
 		gl.LoadIdentity();
 		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
 
-		_texture = context.LoadTexture("Crate.bmp");
+		_texture = context.LoadTexture("Images/crate.bmp");
 	}
 
 	override void OnDrawScene(float time) {
