@@ -5,6 +5,7 @@ using namespace MyGL;
 
 class TestCase {
 public:
+	virtual ~TestCase() {}
 	virtual void Init(SFMLContext &context) = 0;
 	virtual void OnDrawScene(float time) = 0;
 	virtual void OnUpdate(float time) {}
@@ -281,7 +282,7 @@ public:
 		gl.Perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
 
 		gl.LoadIdentity();									// Reset The View
-		gl.Translate(0.0f, 0.0f, -20.0f);
+		gl.Translate(0.0f, 0.0f, -5.0f);
 		gl.Scale(1.0f, 1.0f, 1.0f);
 
 		gl.SetColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -294,38 +295,40 @@ public:
 		gl.BindTexture(GL_TEXTURE_2D, _texture);
 		gl.TexWrapMode(GL_TEXTURE_2D, GL_REPEAT, GL_REPEAT);
 		gl.TexFilterMode(GL_TEXTURE_2D, GL_LINEAR, GL_LINEAR, GL_LINEAR);
+		gl.TexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		gl.TexParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
 		gl.Begin(GL_QUADS);
 		// Front Face
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
-		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
-		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
-		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
 		// Back Face
-		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
-		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
-		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
 		// Top Face
-		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
-		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
-		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
 		// Bottom Face
-		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
-		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
-		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
 		// Right face
-		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
-		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
-		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, -1.0f);
+		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(1.0f, 1.0f, 1.0f);
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(1.0f, -1.0f, 1.0f);
 		// Left Face
 		gl.SetTexCoord(0.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, -1.0f);
-		gl.SetTexCoord(1.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
-		gl.SetTexCoord(1.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
-		gl.SetTexCoord(0.0f, 1.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
+		gl.SetTexCoord(3.0f, 0.0f); gl.AddVertex(-1.0f, -1.0f, 1.0f);
+		gl.SetTexCoord(3.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, 1.0f);
+		gl.SetTexCoord(0.0f, 3.0f); gl.AddVertex(-1.0f, 1.0f, -1.0f);
 		gl.End();
 	}
 
@@ -642,7 +645,7 @@ private:
 int main() {
 	try {
 		SFMLContext context;
-		context.CreateWindow(800, 600, "title");
+		context.CreateWindow(800, 600, "MyGL");
 		auto window = context.GetWindow();
 
 		int frame_count = 0;
