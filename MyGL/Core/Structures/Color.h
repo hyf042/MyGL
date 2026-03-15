@@ -3,7 +3,7 @@
 
 #include "../Math.h"
 #include "../PreDefines.h"
-#include "Structures/Vector.h"
+#include "Vector.h"
 
 namespace MyGL {
 	class Color {

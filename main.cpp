@@ -667,7 +667,11 @@ int main() {
 			// show fps
 			auto current_time = fps_elapsed.getElapsedTime();
 			if (current_time.asSeconds() >= 1.0f) {
+#ifdef _WIN32
 				system("cls");
+#else
+				system("clear");
+#endif
 				std::cout << "FPS: " << frame_count << std::endl;
 				frame_count = 0;
 				fps_elapsed.restart();

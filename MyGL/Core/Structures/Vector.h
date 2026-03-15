@@ -74,7 +74,7 @@ namespace MyGL {
 				else {
 					flag = true;
 				}
-				ss << setiosflags(std::ios::fixed) << std::setprecision(3) << std::setw(10) << _values[i];
+				ss << std::setiosflags(std::ios::fixed) << std::setprecision(3) << std::setw(10) << _values[i];
 			}
 			ss << "]";
 			return ss.str();

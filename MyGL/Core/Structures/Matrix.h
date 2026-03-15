@@ -41,7 +41,7 @@ namespace MyGL {
 					else {
 						flag = true;
 					}
-					ss << setiosflags(std::ios::fixed) << std::setprecision(3) << std::setw(10) << _values[i][j];
+					ss << std::setiosflags(std::ios::fixed) << std::setprecision(3) << std::setw(10) << _values[i][j];
 				}
 				if (i < ROW_NUM - 1) {
 					ss << std::endl;
@@ -109,12 +109,18 @@ namespace MyGL {
 		}
 
 		typename VectorTypeTraits<COL_NUM>::vector_type GetRowVector(int row) const {
-			auto rowData = GetRowArray(row);
-			return typename VectorTypeTraits<COL_NUM>::vector_type(rowData);
+			typename VectorTypeTraits<COL_NUM>::vector_type result;
+			for (int i = 0; i < COL_NUM; i++) {
+				result[i] = _values[row][i];
+			}
+			return result;
 		}
 		typename VectorTypeTraits<ROW_NUM>::vector_type GetColVector(int col) const {
-			auto colData = GetColArray(col);
-			return typename VectorTypeTraits<ROW_NUM>::vector_type(colData);
+			typename VectorTypeTraits<ROW_NUM>::vector_type result;
+			for (int i = 0; i < ROW_NUM; i++) {
+				result[i] = _values[i][col];
+			}
+			return result;
 		}
 
 		static Matrix Identity() {

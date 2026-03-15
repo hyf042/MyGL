@@ -1,6 +1,9 @@
 #ifndef _MYGL_CORE_EXCEPTION_
 #define _MYGL_CORE_EXCEPTION_
 
+#include <exception>
+#include <string>
+
 namespace MyGL {
 	class Exception : public std::exception {
 	public:
@@ -9,10 +12,10 @@ namespace MyGL {
 			kError = 10,
 			kSevere = 100
 		};
-		Exception(int level = kError) : exception(), _level(level) {
+		Exception(int level = kError) : _level(level) {}
+		explicit Exception(std::string error, int level = kError) : _message(error), _level(level) {}
 
-		}
-		explicit Exception(string error, int level = kError) : exception(error.c_str()), _level(level) {}
+		virtual const char* what() const noexcept { return _message.c_str(); }
 
 		int get_level() const {
 			return _level;
@@ -35,6 +38,7 @@ namespace MyGL {
 		}
 
 	private:
+		std::string _message;
 		int _level;
 	};
 }
