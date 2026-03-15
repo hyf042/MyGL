@@ -72,12 +72,7 @@ namespace MyGL {
 			return roundf(val);
 		}
 		static inline float Mod(float val, float div) {
-			if (val > 0) {
-				return val - floor(val / div) * div;
-			}
-			else {
-				return val + ceil(val / div) * div;
-			}
+			return val - floor(val / div) * div;
 		}
 		static inline float Abs(float val) {
 			return abs(val);
@@ -113,7 +108,7 @@ namespace MyGL {
 			return log10(val);
 		}
 		static inline bool IsPowerOf2(int val) {
-			return val >= 0 && val == LOWBIT(val);
+			return val > 0 && val == LOWBIT(val);
 		}
 		static inline float Deg2Rad(float degree) {
 			return degree * Pi / 180.0f;

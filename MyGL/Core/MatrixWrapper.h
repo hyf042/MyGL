@@ -60,7 +60,7 @@ namespace MyGL {
 				throw Exception::ArrayEmptyException();
 			}
 			_matrix = _matrixStack.top();
-			_matrixStack.top();
+			_matrixStack.pop();
 			_dirty = true;
 			return *this;
 		}

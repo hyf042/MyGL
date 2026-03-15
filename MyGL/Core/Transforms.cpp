@@ -49,10 +49,12 @@ namespace MyGL {
 		// The camera looks at the negative direction of forward axis.
 		Vector3 forward = (eye - at).Unit();
 		Vector3 right = Cross(up, forward).Unit();
+		// Reorthogonalize up so that (right, actual_up, forward) form an orthonormal basis.
+		Vector3 actual_up = Cross(forward, right);
 		return Matrixs::CreateMatrix4x4(
-			right.x(), right.y(), right.z(), -eye.x(),
-			up.x(), up.y(), up.z(), -eye.y(),
-			forward.x(), forward.y(), forward.z(), -eye.z(),
+			right.x(), right.y(), right.z(), -Dot(right, eye),
+			actual_up.x(), actual_up.y(), actual_up.z(), -Dot(actual_up, eye),
+			forward.x(), forward.y(), forward.z(), -Dot(forward, eye),
 			0, 0, 0, 1);
 	}
 
