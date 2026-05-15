@@ -4,22 +4,21 @@
 #include "Math.h"
 
 namespace MyGL {
-	vector<Fragment> Rasterizer::RasterizePoint(const Vertex &v) {
-		return RasterizeTriangle(v, v, v);
+	void Rasterizer::RasterizePoint(const Vertex &v, const std::function<void(const Fragment&)> &callback) {
+		RasterizeTriangle(v, v, v, callback);
 	}
 
-	vector<Fragment> Rasterizer::RasterizeLine(const Vertex &v1, const Vertex &v2) {
-		return RasterizeTriangle(v1, v2, v2);
+	void Rasterizer::RasterizeLine(const Vertex &v1, const Vertex &v2, const std::function<void(const Fragment&)> &callback) {
+		RasterizeTriangle(v1, v2, v2, callback);
 	}
 
-	vector<Fragment> Rasterizer::RasterizeTriangle(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
+	void Rasterizer::RasterizeTriangle(const Vertex &v1, const Vertex &v2, const Vertex &v3, const std::function<void(const Fragment&)> &callback) {
 		if (GL::Instance().GetClipping().lock()->BackFaceCulling(v1, v2, v3, GL::Instance().getState())) {
-			return vector<Fragment>();
+			return;
 		}
 		if (!GL::Instance().TestZCulling(v1, v2, v3)) {
-			return vector<Fragment>();
+			return;
 		}
-		vector<Fragment> fragments;
 
 		const Vector3 &p1 = v1.position();
 		const Vector3 &p2 = v2.position();
@@ -43,33 +42,90 @@ namespace MyGL {
 			ScanHorizontal(y, v2, v3, leftMost, rightMost);
 			ScanHorizontal(y, v3, v1, leftMost, rightMost);
 
-			int left = static_cast<int>(Math::Ceil(leftMost.x()));
+			int left  = static_cast<int>(Math::Ceil(leftMost.x()));
 			int right = static_cast<int>(Math::Ceil(rightMost.x() - 1));
 			float delta_x = rightMost.x() - leftMost.x();
 
-			// notices the below part include the calculation of 'footprint', it's the size of the area that one pixel projects onto the texture space,
-			// we need to use footprint to determine the LOD of mipmap in texture filtering, here we use a simple way to calculate it out.
-			// it is, the right-pixel(lerp with x axis + 1)'s offset in x axis related to current pixel.
-			if (left == right) {
-				if (Math::Less(leftMost.x(), rightMost.x())) {
-					Vertex last_vertex = Vertex::Lerp(leftMost, rightMost, (left + 1 - leftMost.x()) / delta_x);
-					auto v = Vertex::Lerp(leftMost, rightMost, (left - leftMost.x()) / delta_x);
-					v.set_position(Vector3(static_cast<float>(left), y, v.z()));
-					fragments.push_back(Fragment(v, Math::Abs(last_vertex.uv().x() - v.uv().x())));
-				}
+			if (left > right || !Math::Less(leftMost.x(), rightMost.x())) {
+				continue;
 			}
-			else if (left < right) {
-				Vertex last_vertex = Vertex::Lerp(leftMost, rightMost, (right + 1 - leftMost.x()) / delta_x);
-				for (int j = right; j >= left; j--) {
-					auto v = Vertex::Lerp(leftMost, rightMost, (j - leftMost.x()) / delta_x);
-					v.set_position(Vector3(static_cast<float>(j), y, v.z()));
-					fragments.push_back(Fragment(v, Math::Abs(last_vertex.uv().x() - v.uv().x())));
-					last_vertex = v;
-				}
+
+			float inv_dx = 1.0f / delta_x;
+			float offset = static_cast<float>(left) - leftMost.x();
+
+			// Linear attribute steps (no perspective correction needed)
+			float dz  = (rightMost.z() - leftMost.z()) * inv_dx;
+			float dr  = (rightMost.color().r() - leftMost.color().r()) * inv_dx;
+			float dg  = (rightMost.color().g() - leftMost.color().g()) * inv_dx;
+			float db  = (rightMost.color().b() - leftMost.color().b()) * inv_dx;
+			float da  = (rightMost.color().a() - leftMost.color().a()) * inv_dx;
+
+			float dnx = (rightMost.normal().x() - leftMost.normal().x()) * inv_dx;
+			float dny = (rightMost.normal().y() - leftMost.normal().y()) * inv_dx;
+			float dnz = (rightMost.normal().z() - leftMost.normal().z()) * inv_dx;
+
+			float dwx = (rightMost.world_position().x() - leftMost.world_position().x()) * inv_dx;
+			float dwy = (rightMost.world_position().y() - leftMost.world_position().y()) * inv_dx;
+			float dwz = (rightMost.world_position().z() - leftMost.world_position().z()) * inv_dx;
+
+			// Perspective-correct UV: interpolate u/w, v/w, and 1/w linearly
+			float left_inv_w  = 1.0f / leftMost.world_z();
+			float right_inv_w = 1.0f / rightMost.world_z();
+			float d_inv_w = (right_inv_w - left_inv_w) * inv_dx;
+
+			float left_u_w  = leftMost.uv().x()  * left_inv_w;
+			float left_v_w  = leftMost.uv().y()  * left_inv_w;
+			float right_u_w = rightMost.uv().x() * right_inv_w;
+			float right_v_w = rightMost.uv().y() * right_inv_w;
+			float d_u_w = (right_u_w - left_u_w) * inv_dx;
+			float d_v_w = (right_v_w - left_v_w) * inv_dx;
+
+			// Seed current values at first pixel
+			float cur_z   = leftMost.z()               + offset * dz;
+			float cur_r   = leftMost.color().r()        + offset * dr;
+			float cur_g   = leftMost.color().g()        + offset * dg;
+			float cur_b   = leftMost.color().b()        + offset * db;
+			float cur_a   = leftMost.color().a()        + offset * da;
+			float cur_nx  = leftMost.normal().x()       + offset * dnx;
+			float cur_ny  = leftMost.normal().y()       + offset * dny;
+			float cur_nz  = leftMost.normal().z()       + offset * dnz;
+			float cur_wx  = leftMost.world_position().x() + offset * dwx;
+			float cur_wy  = leftMost.world_position().y() + offset * dwy;
+			float cur_wz  = leftMost.world_position().z() + offset * dwz;
+			float cur_inv_w = left_inv_w + offset * d_inv_w;
+			float cur_u_w   = left_u_w   + offset * d_u_w;
+			float cur_v_w   = left_v_w   + offset * d_v_w;
+
+			// Seed previous UV.x for footprint calculation
+			float prev_u_x = (cur_inv_w - d_inv_w > 0.0f)
+				? (cur_u_w - d_u_w) / (cur_inv_w - d_inv_w)
+				: (cur_inv_w > 0.0f ? cur_u_w / cur_inv_w : 0.0f);
+
+			for (int j = left; j <= right; j++) {
+				float actual_w = (cur_inv_w != 0.0f) ? 1.0f / cur_inv_w : 0.0f;
+				float actual_u = cur_u_w * actual_w;
+				float actual_v = cur_v_w * actual_w;
+				float footprint = Math::Abs(actual_u - prev_u_x);
+
+				Vertex v(
+					Vector3(static_cast<float>(j), y, cur_z),
+					Color(cur_r, cur_g, cur_b, cur_a),
+					Vector2(actual_u, actual_v),
+					Vector3(cur_nx, cur_ny, cur_nz),
+					Vector3(cur_wx, cur_wy, cur_wz)
+				);
+				callback(Fragment(v, footprint));
+
+				prev_u_x  = actual_u;
+				cur_z    += dz;
+				cur_r    += dr;  cur_g += dg;  cur_b += db;  cur_a += da;
+				cur_nx   += dnx; cur_ny += dny; cur_nz += dnz;
+				cur_wx   += dwx; cur_wy += dwy; cur_wz += dwz;
+				cur_inv_w += d_inv_w;
+				cur_u_w  += d_u_w;
+				cur_v_w  += d_v_w;
 			}
 		}
-
-		return fragments;
 	}
 
 	void Rasterizer::ScanHorizontal(float y, Vertex v1, Vertex v2, Vertex &leftMost, Vertex &rightMost) {

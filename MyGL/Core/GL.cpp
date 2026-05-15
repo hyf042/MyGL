@@ -43,14 +43,20 @@ namespace MyGL {
 	}
 
 	void GL::_DoDrawCall(const unique_ptr<DrawCall> &drawCall) {
+		// Cache texture pointer once per draw call to avoid per-fragment map lookup
+		shared_ptr<Texture> activeTexture;
+		auto it = _state.textureTargets.find(GL_TEXTURE_2D);
+		if (it != _state.textureTargets.end() && it->second->width() > 0 && it->second->height() > 0) {
+			activeTexture = it->second;
+		}
+
 		for (auto &primitive : drawCall->PullPrimitives()) {
 			_DoVertexPipeline(primitive);
-			auto fragments = primitive->Rasterize();
-			for (auto &fragment : fragments) {
+			primitive->Rasterize([this, &activeTexture](const Fragment &fragment) {
 				if (Math::InRange(fragment.get_output_x(), 0, width() - 1) && Math::InRange(fragment.get_output_y(), 0, height() - 1)) {
-					_DoFragmentPipeline(fragment);
+					_DoFragmentPipelineWithTexture(fragment, activeTexture);
 				}
-			}
+			});
 		}
 	}
 
@@ -98,23 +104,27 @@ namespace MyGL {
 	}
 
 	void GL::_DoFragmentPipeline(const Fragment &fragment) {
-		// Depth test
+		shared_ptr<Texture> tex;
+		auto it = _state.textureTargets.find(GL_TEXTURE_2D);
+		if (it != _state.textureTargets.end() && it->second->width() > 0 && it->second->height() > 0) {
+			tex = it->second;
+		}
+		_DoFragmentPipelineWithTexture(fragment, tex);
+	}
+
+	void GL::_DoFragmentPipelineWithTexture(const Fragment &fragment, const shared_ptr<Texture> &texture) {
 		if (IsEnable(GL_DEPTH_TEST)) {
 			if (!DepthTest(fragment)) {
 				return;
 			}
 		}
 
-		// Generate color
-		auto color = _GenerateVertexColor(fragment);
+		auto color = _shader->FragmentFunc(texture, fragment);
 
-		// Alpha blend
 		if (IsEnable(GL_BLEND)) {
 			color = _DoAlphaBlend(color, _colorBuffer->Get(fragment.get_output_x(), fragment.get_output_y()), _state.srcBlendMode, _state.dstBlendMode);
 		}
 
-		// Set final color
-		// notices SFML use ABGR format, we should convert it into ABGR
 		_colorBuffer->SetData(fragment.get_output_x(), fragment.get_output_y(), color.GetDwordInABGR());
 	}
 
@@ -126,15 +136,6 @@ namespace MyGL {
 		return color;
 	}
 
-	Color GL::_GenerateVertexColor(const Fragment &fragment) {
-		if (_state.textureTargets.find(GL_TEXTURE_2D) != _state.textureTargets.end()) {
-			auto& activeTexture = _state.textureTargets[GL_TEXTURE_2D];
-			if (activeTexture->width() > 0 && activeTexture->height() > 0) {
-				return _shader->FragmentFunc(activeTexture, fragment);
-			}
-		}
-		return _shader->FragmentFunc(weak_ptr<Texture>(), fragment);
-	}
 
 	/**
 	 * Utilities

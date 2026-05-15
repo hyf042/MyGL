@@ -435,7 +435,7 @@ namespace MyGL {
 		 * Fragment Pipeline
 		 */
 		void _DoFragmentPipeline(const Fragment &fragment);
-		Color _GenerateVertexColor(const Fragment &fragment);
+		void _DoFragmentPipelineWithTexture(const Fragment &fragment, const shared_ptr<Texture> &texture);
 		Color _DoAlphaBlend(Color src, Color dst, BlendMode srcBlendMode, BlendMode dstBlendMode);
 
 		GLState _state;
