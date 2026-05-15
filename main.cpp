@@ -9,6 +9,7 @@ public:
 	virtual void Init(SFMLContext &context) = 0;
 	virtual void OnDrawScene(float time) = 0;
 	virtual void OnUpdate(float time) {}
+	virtual void OnEvent(const sf::Event &event) {}
 };
 
 class TwoMesh : public TestCase {
@@ -522,39 +523,29 @@ public:
 		gl.End();
 	}
 
-	override void OnUpdate(float time) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L)) {
-			_isLighting = !_isLighting;
-			if (!_isLighting)
-			{
-				GL::Instance().Disable(GL_LIGHTING);
+	override void OnEvent(const sf::Event &event) {
+		if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::L) {
+			GL::Instance().IsEnable(GL_LIGHTING)
+				? GL::Instance().Disable(GL_LIGHTING)
+				: GL::Instance().Enable(GL_LIGHTING);
+		}
+		if (event.type == sf::Event::KeyPressed) {
+			switch (event.key.code) {
+			case sf::Keyboard::Up:    _xspeed -= 0.1f; break;
+			case sf::Keyboard::Down:  _xspeed += 0.1f; break;
+			case sf::Keyboard::Left:  _yspeed -= 0.1f; break;
+			case sf::Keyboard::Right: _yspeed += 0.1f; break;
+			default: break;
 			}
-			else
-			{
-				GL::Instance().Enable(GL_LIGHTING);
-			}
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
-			_xspeed -= 0.01f;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
-			_xspeed += 0.01f;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
-			_yspeed -= 0.01f;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
-			_yspeed += 0.01f;
 		}
 	}
 
 private:
 	shared_ptr<Texture> _texture;
-	float _xrot;
-	float _yrot;
-	float _xspeed = 0;				// X Rotation Speed
-	float _yspeed = 0;				// Y Rotation Speed
-	bool _isLighting = true;
+	float _xrot = 0;
+	float _yrot = 0;
+	float _xspeed = 0;
+	float _yspeed = 0;
 	float _z = -5.0f;
 };
 
@@ -605,40 +596,30 @@ public:
 		_yrot += _yspeed * 5;
 	}
 
-	override void OnUpdate(float time) {
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L)) {
-			_isLighting = !_isLighting;
-			if (!_isLighting)
-			{
-				GL::Instance().Disable(GL_LIGHTING);
+	override void OnEvent(const sf::Event &event) {
+		if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::L) {
+			GL::Instance().IsEnable(GL_LIGHTING)
+				? GL::Instance().Disable(GL_LIGHTING)
+				: GL::Instance().Enable(GL_LIGHTING);
+		}
+		if (event.type == sf::Event::KeyPressed) {
+			switch (event.key.code) {
+			case sf::Keyboard::Up:    _xspeed -= 0.1f; break;
+			case sf::Keyboard::Down:  _xspeed += 0.1f; break;
+			case sf::Keyboard::Left:  _yspeed -= 0.1f; break;
+			case sf::Keyboard::Right: _yspeed += 0.1f; break;
+			default: break;
 			}
-			else
-			{
-				GL::Instance().Enable(GL_LIGHTING);
-			}
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up)) {
-			_xspeed -= 0.01f;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down)) {
-			_xspeed += 0.01f;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left)) {
-			_yspeed -= 0.01f;
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) {
-			_yspeed += 0.01f;
 		}
 	}
 
 private:
 	shared_ptr<Texture> _texture;
 	shared_ptr<Mesh> _sphere;
-	float _xrot;
-	float _yrot;
-	float _xspeed = 0;				// X Rotation Speed
-	float _yspeed = 0;				// Y Rotation Speed
-	bool _isLighting = true;
+	float _xrot = 0;
+	float _yrot = 0;
+	float _xspeed = 0;
+	float _yspeed = 0;
 	float _z = -10.0f;
 };
 
@@ -662,6 +643,7 @@ int main() {
 			{
 				if (event.type == sf::Event::Closed)
 					window.lock()->close();
+				testCase->OnEvent(event);
 			}
 
 			// show fps
